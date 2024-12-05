@@ -1,0 +1,67 @@
+/* CustomerSearch.css */
+
+/* Make sure the container is full-width */
+.customer-search {
+  max-width: 100%;
+  padding: 20px;
+}
+
+.search-container {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* This will make the container fill the full screen height */
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.section-header {
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+/* Styling the search box */
+.search-input {
+  height: 40px;
+  font-size: 16px;
+  padding-left: 10px;
+}
+
+/* Ensuring the results don't go outside the layout */
+.list-group-item {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.row {
+  margin: 0;
+}
+
+/* Centering the input field horizontally and vertically */
+.row.justify-content-center {
+  display: flex;
+  justify-content: center;
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .customer-search {
+    padding: 10px;
+  }
+
+  .form-control {
+    width: 100%;
+  }
+
+  .section-header {
+    font-size: 1.2em;
+  }
+}

@@ -1,0 +1,244 @@
+/* Sidebar Styles */
+.sidebar {
+    width: 250px; /* Sidebar width */
+    background-color: #ff6600; /* Orange background for sidebar */
+    height: 100vh; /* Full height */
+    position: fixed; /* Fix sidebar to the left */
+    top: 0;
+    left: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  
+  .sidebar .logo-image {
+    width: 50%; /* Make logo responsive */
+    height: auto;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .sidebar a {
+    text-decoration: none;
+    color: white;
+    padding: 10px 15px;
+    display: block;
+    margin: 10px 0;
+  }
+  
+  .sidebar a:hover {
+    background-color: #e65100; /* Darker orange for hover */
+  }
+  
+  .submenu {
+    margin-top: 10px;
+  }
+  
+  .submenu a {
+    font-size: 14px;
+    padding-left: 20px;
+  }
+  
+  /* Main Content Styles */
+  .content-area {
+    margin-left: 250px; /* Offset the content to make space for the sidebar */
+    padding: 20px;
+    width: calc(100% - 250px); /* Adjust the width to make room for the sidebar */
+    box-sizing: border-box;
+  }
+  
+  .welcome-section {
+    margin-bottom: 20px;
+  }
+  
+  .centered-content {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  .scrollable-content {
+    overflow-y: auto;
+    height: calc(100vh - 120px); /* Allow scrolling for the content */
+  }
+  
+
+
+
+  /* Custom scrollbar for the sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #ff6600;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto; /* Ensure the sidebar is scrollable */
+  }
+  
+  /* Make the scrollbar thinner */
+  .sidebar::-webkit-scrollbar {
+    width: 6px; /* Adjust width for the scrollbar */
+  }
+  
+  /* Customize the scrollbar track (background of the scrollbar) */
+  .sidebar::-webkit-scrollbar-track {
+    background-color: #f1f1f1; /* Light background for the track */
+  }
+  
+  /* Customize the scrollbar thumb (the draggable part) */
+  .sidebar::-webkit-scrollbar-thumb {
+    background-color: #f7ebeb; /* Darker color for the thumb */
+    border-radius: 10px; /* Optional: Round the edges of the scrollbar thumb */
+  }
+  
+  /* Customize the scrollbar thumb when hovered */
+  .sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: #f5eded; /* Darker color when hovered */
+  }
+  
+
+
+
+
+
+
+
+
+  .individual-loan-section {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .loan-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .loan-table th,
+  .loan-table td {
+    border: 1px solid #360970;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  .loan-table th {
+    background-color: #f3f7f8;
+    color: white;
+  }
+  
+  .loan-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .loan-table tr:hover {
+    background-color: #ddd;
+  }
+  
+  .action-button {
+    background-color: #f0f5f8;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .action-button:hover {
+    background-color: #4f1e7e;
+  }
+  
+  .subtitle {
+    margin-top: 10px;
+    color: #555;
+    font-style: italic;
+    font-weight: 500;
+  }
+  
+  .search-section {
+    margin: 15px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .search-input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 300px; /* Adjust this to make it shorter */
+    max-width: 100%; /* Ensures it doesn't overflow in smaller containers */
+  }
+  
+  .search-button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #687788;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .search-button:hover {
+    background-color: #0056b3;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+  .action-dropdown {
+    position: relative;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    list-style: none;
+    padding: 5px 0;
+    margin: 5px 0 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    width: 150px;
+  }
+  
+  .dropdown-menu li {
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .dropdown-menu li:hover {
+    background-color: #f0f0f0;
+  }
+  
+
+
+
+
+  .action-dropdown {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+  }
+  
