@@ -124,7 +124,7 @@ const Expenses = ({
 
       {/* Loan Term */}
       <div className="col-md-6 mb-4">
-        <label htmlFor="loanTerm" className="form-label ">Loan Term (Years)</label>
+        <label htmlFor="loanTerm" className="form-label ">Loan Term (Month)</label>
         <div className="input-group">
           <input
             type="number"

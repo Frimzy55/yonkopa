@@ -438,3 +438,39 @@
 .search-button:disabled {
   background-color: #cccccc;
 }
+
+
+
+
+
+
+
+
+
+/* Add a border to each row */
+tbody tr {
+  border: 2px solid transparent;
+  transition: border 0.3s ease;
+}
+
+/* On hover, change the border color */
+tbody tr:hover {
+  border: 2px solid #007bff; /* Change to the color you prefer */
+  background-color: #f1f1f1; /* Optional background color change */
+}
+
+
+/* Add this to your custom styles */
+
+/* Apply to all table rows */
+.table-row-hover {
+  transition: border 0.3s ease, background-color 0.3s ease;
+  border: 2px solid transparent; /* Transparent border for initial state */
+}
+
+/* Hover effect: change border and background color */
+.table-row-hover:hover {
+  border: 2px solid #007bff; /* Change to the color you prefer */
+  background-color: #f1f1f1;  /* Optional background color on hover */
+}
+

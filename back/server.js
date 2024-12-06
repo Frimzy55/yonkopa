@@ -57,6 +57,7 @@ app.post('/login', (req, res) => {
   });
 });
 
+
 // Register endpoint for creating customers
 app.post('/register', (req, res) => {
   const {
@@ -377,6 +378,130 @@ app.get('/get-existing-ids', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch existing IDs' });
   }
 });
+
+// Endpoint to handle saving customer data
+
+
+app.post('/customer', (req, res) => {
+  const {
+    customer_id,
+    applicant_name,
+    telephone_number,
+    credit_officer,
+    date_of_birth,
+    branch,
+    region,
+    amount_requested,
+  } = req.body;
+
+  // Format the date to MySQL-compatible format
+ 
+
+  const query = `
+    INSERT INTO customer_details 
+    (customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, amount_requested)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(
+    query,
+    [customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, amount_requested],
+    (err, result) => {
+      if (err) {
+        console.error('Error inserting customer details:', err);
+        return res.status(500).json({ error: 'Failed to save customer details' });
+      }
+      res.status(200).json({ message: 'Customer details saved successfully', data: result });
+    }
+  );
+});
+
+
+
+app.post('/api/land', (req, res) => {
+  const {
+    customer_id,
+    location,
+    landTitle,
+    marketValue,
+    ltvRatio,
+    nearestLandmark,
+    digitalAddress,
+    forcedSaleValue,
+    ltvRatioPlus10,
+  } = req.body;
+
+  const query = `
+    INSERT INTO land_details 
+    (customer_id,location, land_title, market_value, ltv_ratio, nearest_landmark, digital_address, forced_sale_value, ltv_ratio_plus_10)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
+  `;
+
+  db.query(
+    query,
+    [customer_id,location, landTitle, marketValue, ltvRatio, nearestLandmark, digitalAddress, forcedSaleValue, ltvRatioPlus10],
+    (err, result) => {
+      if (err) {
+        console.error('Error inserting land details:', err);
+        return res.status(500).json({ error: 'Failed to save land details' });
+      }
+      res.status(200).json({ message: 'Land details saved successfully', data: result });
+    }
+  );
+});
+
+
+app.post('/api/vehicle', (req, res) => {
+  const { customer_id, vbrand, vchasiss, vmodelyeaar, vmarket, vltvRatio, vmodel, vregister, vmileage, vforcedSaleValue, vltvRatioPlus10 } = req.body;
+
+  const query = `INSERT INTO vehicle_details (customer_id, brand, chassis_number, model_year, market_value, ltv_ratio, model, registration_number, mileage, forced_sale_value, ltv_ratio_plus_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  const values = [customer_id, vbrand, vchasiss, vmodelyeaar, vmarket, vltvRatio, vmodel, vregister, vmileage, vforcedSaleValue, vltvRatioPlus10];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error inserting data:', err);
+      return res.status(500).send('Database error');
+    }
+    res.status(200).send('Vehicle details added successfully');
+  });
+});
+
+
+app.post('/api/build', (req, res) => {
+  const { customer_id, blocation, blandTitle, bmarketValue, bltvRatio, bnearestLandmark, bdigitalAddress, bforcedSaleValue, bltvRatioPlus10 } = req.body;
+
+  const query = `INSERT INTO build_details (customer_id, location, land_title, market_value, ltv_ratio, nearest_landmark, digital_address, forced_sale_value, ltv_ratio_plus_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  const values = [customer_id, blocation, blandTitle, bmarketValue, bltvRatio, bnearestLandmark, bdigitalAddress, bforcedSaleValue, bltvRatioPlus10];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error inserting data:', err);
+      return res.status(500).send('Database error');
+    }
+    res.status(200).send('Build details added successfully');
+  });
+});
+
+
+app.post('/api/cash', (req, res) => {
+  const { customer_id, cash_amount } = req.body;
+
+  const query = `INSERT INTO cash_details (customer_id, cash_amount) VALUES (?, ?)`;
+
+  const values = [customer_id, cash_amount];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error inserting data:', err);
+      return res.status(500).send('Database error');
+    }
+    res.status(200).send('Cash data added successfully');
+  });
+});
+
+
 
 // Server listening on port 5002
 app.listen(5001, () => {

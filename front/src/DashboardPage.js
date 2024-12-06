@@ -8,6 +8,7 @@ import CustomerSearch from './CustomerSearch';
 import CreateNewApplication from './CreateNewApplication';
 import IndividualLoan from './IndividualLoan';
 import { FaUserCircle } from 'react-icons/fa'; 
+import { MdAssessment } from 'react-icons/md';
 
 // Import React Icons
 import {
@@ -21,6 +22,7 @@ import {
   FaHandHoldingUsd, // Loans Disbursed
   FaWallet, // Cash on Hand
 } from 'react-icons/fa';
+import Assessment from './Assessment';
 
 const DashboardPage = () => {
   //const location = useLocation();
@@ -36,6 +38,7 @@ const DashboardPage = () => {
   const [isCustomerMenuOpen, setIsCustomerMenuOpen] = useState(false);
   const [isLoanMenuOpen, setIsLoanMenuOpen] = useState(false);
   const [isCreditAssessmentMenuOpen, setIsCreditAssessmentMenuOpen] = useState(false);
+  const[isCreditComiteeMenu,setIsCreditComiteeMenu]=useState(false)
   //const [activeSection, setActiveSection] = useState('');
 
   //const location = useLocation();
@@ -93,6 +96,11 @@ const DashboardPage = () => {
 
   const toggleCreditAssessmentMenu = () => {
     setIsCreditAssessmentMenuOpen(!isCreditAssessmentMenuOpen);
+    setActiveSection('');
+  };
+
+  const toggleCreditComiteeMenu=()=>{
+    setIsCreditComiteeMenu(!isCreditComiteeMenu);
     setActiveSection('');
   };
 
@@ -170,7 +178,21 @@ const DashboardPage = () => {
               </ul>
             )}
           </li>
-          <li><a href="#credit" className="text-white"><FaClipboardList /> Credit Committee</a></li>
+          <li>
+            <a href="#credit" className="text-white" onClick={toggleCreditComiteeMenu}><FaClipboardList /> 
+          Credit Committee
+          </a>
+          {isCreditComiteeMenu && (
+              <ul className="submenu list-unstyled ms-3">
+                <li>
+                  <button className="text-white btn btn-link" onClick={() => handleMenuClick('Assessment Files')}>
+                    <MdAssessment /> Assessment Files
+                  </button>
+                </li>
+              </ul>
+            )}
+          </li>
+
           <li><a href="#reports" className="text-white"><FaCogs /> Reports</a></li>
           <li><a href="#operation" className="text-white"><FaCogs /> Operational Workflow</a></li>
         </ul>
@@ -254,6 +276,9 @@ const DashboardPage = () => {
             </div>
           ) : activeSection === 'Individual Loan' ? (
             <IndividualLoan />
+          ) : activeSection === 'Assessment Files' ? (
+            <Assessment />
+          
           ) : (
             <div className="centered-content d-flex justify-content-around text-center mt-5">
   <div

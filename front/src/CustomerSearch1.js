@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import moment from 'moment';
 
 const CustomerSearch1 = ({ onSelectCustomer }) => {
+  const [submitStatus, setSubmitStatus] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -39,10 +40,12 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
   const handleSelectCustomer = (customer) => {
     try {
       onSelectCustomer(customer);
-      alert('Customer selected successfully');
+      //alert('Customer selected successfully');
+      setSubmitStatus({ success: true, message: 'Customer selected successfully!' });
     } catch (err) {
       console.error('Error selecting customer:', err);
-      alert('There was an error processing your selection');
+      setSubmitStatus({ success: false, message: 'Error submitting form. Please try again.' });
+      //alert('There was an error processing your selection');
     }
   };
 
@@ -51,6 +54,10 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
     const now = moment();
     const recordDate = moment(dateString);
     return recordDate.isValid() ? recordDate.fromNow() : 'Unknown';
+  };
+
+  const handleOkClick = () => {
+    setSubmitStatus(null);
   };
 
   return (
@@ -139,6 +146,18 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
           {!showTable && !error && (
             <div className="text-muted text-center">No customers found. Try another search query.</div>
           )}
+          {submitStatus && (
+        <div className={`alert ${submitStatus.success ? 'alert-success' : 'alert-danger'}`}>
+          {submitStatus.message}
+          <button
+            type="button"
+            className="btn btn-sm btn-link float-end"
+            onClick={handleOkClick}
+          >
+            OK
+          </button>
+        </div>
+      )}
         </div>
       </div>
     </div>

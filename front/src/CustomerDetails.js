@@ -1,15 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from 'moment';
 import { FaUser } from 'react-icons/fa'; // Import the user icon from react-icons
+import axios from 'axios'; // To make HTTP requests
 
 const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => {
+  const [saving, setSaving] = useState(false); // To track the save process
+  const [status, setStatus] = useState({ message: '', type: '' }); // For status messages
+
   if (!customer) {
     return null; // Don't render anything if no customer is selected
   }
 
   const formatDate = (dateString) => {
     return moment(dateString).format('MM/DD/YYYY');
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+
+    try {
+      // Reformat the date_of_birth to 'YYYY-MM-DD'
+      const formattedDate = moment(customer.date_of_birth).format('YYYY-MM-DD');
+
+      const response = await axios.post('http://localhost:5001/customer', {
+        customer_id: customer.customer_id,
+        applicant_name: customer.applicant_name,
+        telephone_number: customer.telephone_number,
+        credit_officer: customer.credit_officer,
+        date_of_birth: formattedDate, // Use the formatted date here
+        branch: customer.branch,
+        region: customer.region,
+        amount_requested: customer.amount_requested,
+      });
+
+      // Update status with success message
+      setStatus({ message: response.data.message || 'Customer saved successfully!', type: 'success' });
+    } catch (error) {
+      console.error('Error saving customer:', error);
+
+      // Update status with error message
+      setStatus({ message: 'Error saving customer. Please try again.', type: 'error' });
+    } finally {
+      setSaving(false); // End saving process
+    }
+  };
+
+  const renderStatusMessage = () => {
+    if (!status.message) return null;
+
+    const alertClass = status.type === 'success' ? 'alert-success' : 'alert-danger';
+    return <div className={`alert ${alertClass} mt-3`}>{status.message}</div>;
   };
 
   return (
@@ -79,9 +120,19 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
               </div>
             </div>
           </div>
+          {/* Render Status Message */}
+          {renderStatusMessage()}
         </div>
-        <div className="card-footer text-muted">
-          View more details or take an action on this customer.
+        {/* Save Button Below the Content */}
+        <div className="card-footer text-muted d-flex justify-content-between align-items-center">
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleSave} // Trigger the save function
+            disabled={saving} // Disable button while saving
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+          <span>View more details or take an action on this customer.</span>
         </div>
       </div>
     </div>

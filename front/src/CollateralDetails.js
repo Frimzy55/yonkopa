@@ -3,6 +3,7 @@ import { FaMoneyCheckAlt } from 'react-icons/fa'; // Import the icon
 import LandForm from './LandForm'; // Import the LandForm component
 import BuildForm from './BuildForm';
 import VehicleForm from './VehicleForm';
+import Cash from './Cash';
 
 const CollateralDetails = ({ customer, onBack, onNext, hasNext }) => {
   const [lendingType, setLendingType] = useState('unsecure'); // State to track lending type
@@ -25,7 +26,6 @@ const CollateralDetails = ({ customer, onBack, onNext, hasNext }) => {
     <div className="container my-4">
       <div className="card shadow-lg rounded">
         <div className="card-header bg-white text-primary d-flex justify-content-between align-items-center">
-          {/* Add the icon next to the header text */}
           <h3 className="mb-0">
             <FaMoneyCheckAlt className="me-2" /> Collateral Details
           </h3>
@@ -35,7 +35,6 @@ const CollateralDetails = ({ customer, onBack, onNext, hasNext }) => {
           </div>
         </div>
         <div className="card-body">
-          {/* Lending Type Section */}
           <div className="mb-4">
             <h5 className="text-primary">Lending Type</h5>
             <div className="form-check form-check-inline">
@@ -66,7 +65,6 @@ const CollateralDetails = ({ customer, onBack, onNext, hasNext }) => {
             </div>
           </div>
 
-          {/* Show these fields only when "Secure Lending" is selected */}
           {lendingType === 'secure' && (
             <>
               <div className="mb-4 row">
@@ -88,31 +86,12 @@ const CollateralDetails = ({ customer, onBack, onNext, hasNext }) => {
                 </div>
               </div>
 
-              {/* Conditionally render the LandForm component if 'Land' is selected */}
-              {securityType === 'Property' && <LandForm />}
-              {securityType === 'Shares' && <BuildForm />}
-              {securityType === 'Vehicle' && <VehicleForm />}
+              {securityType === 'Property' && <LandForm customer={customer} />}
+              {securityType === 'Shares' && <BuildForm customer={customer} />}
+              {securityType === 'Vehicle' && <VehicleForm customer={customer} />}
+              {securityType === 'Gold' && <Cash customer={customer} />}
 
-              {/* Show the additional fields if "Cash/Fixed Deposit" (Gold) is selected */}
-              {securityType === 'Gold' && (
-                <div className="mb-4 row">
-                  <div className="col-md-3">
-                    <label htmlFor="cashAmount" className="form-label text-primary">Total Value</label>
-                    <div className="input-group">
-                      <div className="input-group-text bg-light text-muted">GH¢</div>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        id="cashAmount"
-                        value={cashAmount}
-                        onChange={(e) => setCashAmount(e.target.value)}
-                        placeholder="0.00"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+          
             </>
           )}
         </div>

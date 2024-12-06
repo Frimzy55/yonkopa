@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import './IndividualLoan.css';
 import CustomerDetails from './CustomerDetails';
 import CollateralDetails from './CollateralDetails';
-import CreditWorthDetail from './CreditWorthDetail'; // New stage
+import CreditWorthDetail from './CreditWorthDetail';
 import Comment from './Comment';
+import CreateNewApplication from './CreateNewApplication';  // Import the new submenu component
 import moment from 'moment';
-import { useNavigate } from 'react-router-dom'; // Import the hook
+import { useNavigate } from 'react-router-dom';
+import './App.css';
 
 const IndividualLoan = () => {
   const [loanApplications, setLoanApplications] = useState([]);
@@ -14,8 +16,6 @@ const IndividualLoan = () => {
   const [selectedCustomerIndex, setSelectedCustomerIndex] = useState(null);
   const [entriesPerPage, setEntriesPerPage] = useState(5);
   const [stage, setStage] = useState('customer'); // Track current stage
-
-  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     const fetchLoanApplications = async () => {
@@ -47,15 +47,14 @@ const IndividualLoan = () => {
     switch (action) {
       case 'Proceed':
         setSelectedCustomerIndex(customerIndex);
+        setStage('customer');
         break;
       case 'Skip Assessment':
         alert(`Skipping assessment for customer ID: ${loanApplications[customerIndex].customer_id}`);
         break;
       case 'Reprocess':
-        navigate('/CreateNewApplication', {
-          state: { customerId: loanApplications[customerIndex].customer_id },
-        });
-       // alert(`Reprocessing loan application for customer ID: ${loanApplications[customerIndex].customer_id}`);
+        setSelectedCustomerIndex(customerIndex); // Store the customer index for reprocessing
+        setStage('createNewApplication'); // Switch to the create new application stage
         break;
       default:
         break;
@@ -73,22 +72,19 @@ const IndividualLoan = () => {
       alert('You are at the final stage');
     }
   };
-  
+
   const handleBack = () => {
     if (stage === 'collateral') {
       setStage('customer');
-    } 
-    else if (stage === 'creditWorth') {
+    } else if (stage === 'creditWorth') {
       setStage('collateral');
-     // else if (stage==='comment')
-    } 
-    else if (stage === 'comment') {
+    } else if (stage === 'comment') {
       setStage('creditWorth');
-     // else if (stage==='comment')
-    } 
-
-    else {
+    } else if (stage === 'createNewApplication') {
+      setStage('customer'); // Return to customer details stage
+    } else {
       setSelectedCustomerIndex(null); // Return to table view
+      setStage('customer');  // Ensure you're back at the loan list stage
     }
   };
 
@@ -99,7 +95,7 @@ const IndividualLoan = () => {
   const displayedApplications = filteredApplications.slice(0, entriesPerPage);
 
   return (
-    <div className="individual-loan-section">
+    <div className="individual-loan-section"  style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
       <h3>Credit Assessment</h3>
       <p>Pending Assessment Credit</p>
       <div className="search-section">
@@ -116,7 +112,7 @@ const IndividualLoan = () => {
       </div>
 
       <div className="main-content">
-        {selectedCustomerIndex !== null && (
+        {selectedCustomerIndex !== null && stage !== 'createNewApplication' && (
           <>
             {stage === 'customer' && (
               <CustomerDetails
@@ -156,7 +152,15 @@ const IndividualLoan = () => {
           </>
         )}
 
-        {selectedCustomerIndex === null && (
+        {/* Render CreateNewApplication as a submenu */}
+        {stage === 'createNewApplication' && (
+          <CreateNewApplication
+            customerId={loanApplications[selectedCustomerIndex].customer_id}
+            onBack={handleBack}
+          />
+        )}
+
+        {selectedCustomerIndex === null && stage !== 'createNewApplication' && (
           <div className="loan-table-section">
             <div className="entries-per-page-section mb-3">
               <label htmlFor="entriesPerPage" className="form-label">
@@ -191,7 +195,7 @@ const IndividualLoan = () => {
               <tbody>
                 {displayedApplications.length > 0 ? (
                   displayedApplications.map((application, index) => (
-                    <tr key={application.customer_id}>
+                    <tr key={application.customer_id} className="table-row-hover">
                       <td>
                         <select
                           className="action-dropdown form-control"
