@@ -43,7 +43,7 @@ const LandForm = ({ customer }) => {
       setLtvRatioPlus10('');
     } catch (error) {
       console.error('Error saving land details:', error);
-      setSubmitStatus({ success: false, message: 'Error submitting form. Please try again.' });
+      setSubmitStatus({ danger: false, message: 'Error submitting form. Please try again.' });
      // alert('Failed to save land details. Please try again.');
     }
   };

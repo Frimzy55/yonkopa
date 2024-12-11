@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 
 
 const Expenses = ({
+  
   principal,
   setPrincipal,
   rate,
@@ -31,16 +32,24 @@ const Expenses = ({
   otherIncomeInput,
   setOtherIncomeInput,
   householdSurplus,
+  
   loanRe,
   surplus,
   setSurplus,
+  
   surplusValue,
   setSurplusValue,
   handleSurplusCalculation,
+   // Accept customer as a prop
+
+
+// ...restProps
   
-  handleDisplayResult,
-  result,
+  
+ // handleDisplayResult,
+ // result,
 }) => {
+  
     const [showSurplus, setShowSurplus] = useState(false); 
     const [surplusInterpretation, setSurplusInterpretation] = useState(""); // New state
 
@@ -84,12 +93,14 @@ const Expenses = ({
     
         setShowSurplus(true);
       };
-    
+
   return (
     <div className="container">
-      <div className="row">
+     
+      <div className="row"> 
 
       <div className="col-md-6 mb-4">
+      
         <label htmlFor="principal" className="form-label ">Principal</label>
         <div className="input-group">
           <div className="input-group-text bg-light text-muted">GH¢</div>
@@ -308,7 +319,7 @@ const Expenses = ({
                   <input
                     type="number"
                     className="form-control form-control-sm"
-                    id="householdExpenses"
+                    id="householdExpensesInput"
                     value={householdExpensesInput}
                     onChange={(e) => setHouseholdExpensesInput(e.target.value)}
                     placeholder="0.00"
@@ -324,7 +335,7 @@ const Expenses = ({
                   <input
                     type="number"
                     className="form-control form-control-sm"
-                    id="otherIncome"
+                    id="otherIncomeInput"
                     value={otherIncomeInput}
                     onChange={(e) => setOtherIncomeInput(e.target.value)}
                     placeholder="0.00"

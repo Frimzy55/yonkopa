@@ -34,7 +34,7 @@ const BuildForm = ({ customer }) => {
       setSubmitStatus({ success: true, message: 'Form submitted successfully!' });
     } catch (error) {
       console.error(error); // Handle error
-      setSubmitStatus({ success: false, message: 'Error submitting form. Please try again.' });
+      setSubmitStatus({ danger: false, message: 'Error submitting form. Please try again.' });
     }
   };
 

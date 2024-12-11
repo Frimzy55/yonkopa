@@ -196,14 +196,6 @@ app.get('/search-customers', (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
 app.post('/loan-application', (req, res) => {
   const {
     customerId,
@@ -501,6 +493,88 @@ app.post('/api/cash', (req, res) => {
   });
 });
 
+
+
+
+
+app.post("/api/credit", (req, res) => {
+  const {
+    customer_id,
+    isCreditworthy,
+    businessType,
+    businessLocation,
+    businessStartDate,
+    nearestLandmark,
+    businessDescription,
+    canPayLoan,
+    currentStockValue,
+    startedBusinessWith,
+    sourceOfFund,
+    principal,
+    rate,
+    loanTerm,
+    loanAmount,
+    interest,
+    monthlyInstallment,
+    monthlySalesRevenue,
+    grossMarginInput,
+    grossProfit,
+    costOfGoodsSold,
+    totalOperatingExpenses,
+    netBusinessProfit,
+    householdExpensesInput,
+    otherIncomeInput,
+    loanRe,
+    householdSurplus,
+  } = req.body;
+
+  const sql = `
+    INSERT INTO business_loans (
+      customer_id, isCreditworthy, businessType, businessLocation, businessStartDate, nearestLandmark,
+      businessDescription, canPayLoan, currentStockValue, startedBusinessWith, sourceOfFund,
+      principal, rate, loanTerm, loanAmount, interest, monthlyInstallment, monthlySalesRevenue,
+      grossMarginInput, grossProfit, costOfGoodsSold, totalOperatingExpenses, netBusinessProfit,
+      householdExpensesInput, otherIncomeInput, loanRe, householdSurplus
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const values = [
+    customer_id, isCreditworthy, businessType, businessLocation, businessStartDate, nearestLandmark,
+    businessDescription, canPayLoan, currentStockValue, startedBusinessWith, sourceOfFund,
+    principal, rate, loanTerm, loanAmount, interest, monthlyInstallment, monthlySalesRevenue,
+    grossMarginInput, grossProfit, costOfGoodsSold, totalOperatingExpenses, netBusinessProfit,
+    householdExpensesInput, otherIncomeInput, loanRe, householdSurplus,
+  ];
+
+  db.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error inserting data:", err);
+      res.status(500).json({ error: "Failed to insert data" });
+    } else {
+      res.status(201).json({ message: "Business loan added successfully", id: result.insertId });
+    }
+  });
+});
+
+app.post('/api/comments', (req, res) => {
+  const { customer_id, comment } = req.body;
+
+  if (!customer_id || !comment) {
+    return res.status(400).json({ message: 'Customer ID and comment are required.' });
+  }
+
+  const query = 'INSERT INTO comments (customer_id, comment) VALUES (?, ?)';
+  db.promise().query(query, [customer_id, comment])
+    .then(([results]) => {
+      console.log('Comment saved:', results);
+      res.status(201).json({ message: 'Comment saved successfully!', id: results.insertId });
+    })
+    .catch((error) => {
+      console.error('Error saving comment:', error);
+      res.status(500).json({ message: 'Failed to save comment. Please try again.' });
+    });
+});
 
 
 // Server listening on port 5002

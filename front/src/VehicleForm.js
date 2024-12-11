@@ -37,7 +37,7 @@ const VehicleForm = ({ customer }) => {
       setSubmitStatus({ success: true, message: 'Form submitted successfully!' });// You can handle success here
     } catch (error) {
       console.error(error); // Handle error here
-      setSubmitStatus({ success: false, message: 'Error submitting form. Please try again.' });
+      setSubmitStatus({ danger: false, message: 'Error submitting form. Please try again.' });
     }
   };
 

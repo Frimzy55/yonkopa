@@ -4,7 +4,7 @@ import { FaRegCreditCard } from 'react-icons/fa'; // Credit card icon
 //import { calculateCostOfGoodsSold, calculateGrossProfit, calculateTotalOperatingExpenses, } from './calculations';
 import LoanCalculator from './LoanCalculator'; 
 import Expenses from './Expenses';
-
+import axios from 'axios';
 
 import {
   calculateCostOfGoodsSold,
@@ -17,6 +17,7 @@ import {
 
 
 const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
+  const [submitStatus, setSubmitStatus] = useState(null);
   const [isCreditworthy, setIsCreditworthy] = useState(null); // State to track creditworthiness
   const [businessType, setBusinessType] = useState(''); // State to track business type
   const [businessLocation, setBusinessLocation] = useState(''); // Business location
@@ -56,64 +57,13 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
 
 
 
- //const handleSurplusCalculation = () => {
-    //const surplus = loanRe - monthlyInstallment;
-    //setSurplus(surplus);
-  //};
-
-
-  /*const handleSalesRevenueChange = (e) => {
-    const sales = parseFloat(e.target.value) ;
-    setMonthlySalesRevenue(sales);
-
-  // Get the Gross Margin percentage input (e.g., 80 for 80%)
-  const grossMarginPercentage = parseFloat(grossMarginInput) ;
-
-  // Calculate Cost of Goods Sold based on Gross Margin
-  const cogs = calculateCostOfGoodsSold(sales, grossMarginPercentage);
-  setCostOfGoodsSold(cogs);
-
-  // Calculate Gross Profit
-  const grossProfit = calculateGrossProfit(sales, cogs);
-  setGrossProfit(grossProfit);
-
-  // Calculate Total Operating Expenses
-  //const totalExpenses = calculateTotalOperatingExpenses(cogs);
- // setTotalOperatingExpenses(totalExpenses);
-
-
-  // Assuming cogs (Cost of Goods Sold), grossMargin, grossProfit, and monthlySalesRevenue are already defined
-const totalExpenses = calculateTotalOperatingExpenses(
-  monthlySalesRevenue,
-  cogs,
-  grossProfit,
-  grossMargin,
-);
-setTotalOperatingExpenses(totalExpenses);
-
-
-  // Calculate Net Business Profit
-  const netProfit = calculateNetBusinessProfit(grossProfit, totalExpenses);
-  setNetBusinessProfit(netProfit);
-
-  //const householdSurplus = calculateHouseholdSurplus(  netBusinessProfit, otherIncome, householdExpenses);
-  //setHouseholdSurplus(householdSurplus);
-
-  const otherIncome = parseFloat(otherIncomeInput) || 0; // Default to 0 if invalid
-  const householdExpenses = parseFloat(householdExpensesInput) || 0; // Default to 0 if invalid
-
-  // Calculate Household Surplus
-  const householdSurplus = calculateHouseholdSurplus(netProfit, otherIncome, householdExpenses);
-  setHouseholdSurplus(householdSurplus);
-
-  const loanRe = householdSurplus * 0.6;
-  setLoanRecommendation(loanRe);
+ 
 
 
   
   
    
-  };*/
+  
   const recalculateResults = () => {
     const salesRevenue = parseFloat(monthlySalesRevenue) || 0;
     const grossMarginPercentage = parseFloat(grossMarginInput) || 0;
@@ -192,8 +142,58 @@ setTotalOperatingExpenses(totalExpenses);
     setSourceOfFund(e.target.value);
   };
 
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        customer_id: customer.customer_id,
+        isCreditworthy,
+        businessType,
+        businessLocation,
+        businessStartDate,
+        nearestLandmark,
+        businessDescription,
+        canPayLoan,
+        currentStockValue,
+        startedBusinessWith,
+        sourceOfFund,
+        principal,
+        rate,
+        loanTerm,
+        loanAmount,
+        interest,
+        monthlyInstallment,
+        monthlySalesRevenue,
+        grossMarginInput,
+        //handleSalesRevenueChange,
+        grossProfit,
+        costOfGoodsSold,
+        totalOperatingExpenses,
+        netBusinessProfit,
+        householdExpensesInput,
+        otherIncomeInput,
+        loanRe,
+        householdSurplus,
+        //surplus,
+        //result
+
+      };
+  
+      const response = await axios.post('http://localhost:5001/api/credit', payload);
+      if (response.status === 200) {
+        //alert('Data saved successfully!');
+        setSubmitStatus({ success: true, message: 'Form submitted successfully!' });
+      }
+    } catch (error) {
+      console.error('Error saving data:', error);
+      //alert('Failed to save data. Please try again.');
+      setSubmitStatus({ danger: false, message: 'Error submitting form. Please try again.' });
+    }
+  };
 
 
+  const handleOkClick = () => {
+    setSubmitStatus(null);
+  };
   //};
 
   return (
@@ -275,6 +275,7 @@ setTotalOperatingExpenses(totalExpenses);
               </div>
 
               <div className="row">
+              <h5 className="text-primary">Customer ID: {customer.customer_id}</h5>
                 <div className="col-md-6 mb-4">
                   <label htmlFor="businessLocation" className="form-label text-primary">Business Location</label>
                   <input
@@ -392,6 +393,7 @@ setTotalOperatingExpenses(totalExpenses);
                       
                       />
                   </div> */}
+                  
 
                    
 
@@ -437,6 +439,24 @@ setTotalOperatingExpenses(totalExpenses);
                       <label className="form-check-label" htmlFor="othersSource">Others</label>
                       
                     </div>
+                   {/* {submitStatus && (
+                        <div className={`alert ${submitStatus.success ? 'alert-success' : 'alert-danger'}`}>
+                            {submitStatus.message}
+                           <button
+                            type="button"
+                            className="btn btn-sm btn-link float-end"
+                              onClick={handleOkClick}
+                              >
+                                 OK
+                           </button>
+                        </div>
+                     )}
+
+                    <div className="card-footer">
+                        <button className="btn btn-primary" onClick={handleSubmit}>
+                         Save
+                        </button>
+                  </div> */}
                     <br></br>
                     <br></br>
                     <br></br>
@@ -446,6 +466,7 @@ setTotalOperatingExpenses(totalExpenses);
 
                 <div className='row'>
                 <Expenses
+                 //customer={customer}
                  principal={principal}
                  setPrincipal={setPrincipal}
                  rate={rate}
@@ -465,15 +486,24 @@ setTotalOperatingExpenses(totalExpenses);
                  handleSalesRevenueChange={handleSalesRevenueChange}
                  setHandleSalesRevenueChange={setHandleSalesRevenueChange}
                  costOfGoodsSold={costOfGoodsSold}
+                 setCostOfGoodsSold={setCostOfGoodsSold}
                  grossProfit={grossProfit}
+                 setGrossProfit={setGrossProfit}
                  totalOperatingExpenses={totalOperatingExpenses}
+                 setTotalOperatingExpenses={setTotalOperatingExpenses}
                  netBusinessProfit={netBusinessProfit}
+                 setNetBusinessProfit={setNetBusinessProfit}
                  householdExpensesInput={householdExpensesInput}
                  setHouseholdExpensesInput={setHouseholdExpensesInput}
                  otherIncomeInput={otherIncomeInput}
+                 
                  setOtherIncomeInput={setOtherIncomeInput}
                  householdSurplus={householdSurplus}
+                 setHouseholdSurplus={setHouseholdSurplus}
                  loanRe={loanRe}
+                 setLoanRecommendation={setLoanRecommendation}
+
+                 surplusValue={surplusValue}
                  setSurplusValue={setSurplusValue}
                  //setLoanRecommendation={handleLoanRecommendationUpdate}
                  //handleSurplusCalculation={handleSurplusCalculation}
@@ -482,13 +512,25 @@ setTotalOperatingExpenses(totalExpenses);
                  handleDisplayResult={handleDisplayResult}
                  result={result}
                 />
-          
 
+                  {submitStatus && (
+                        <div className={`alert ${submitStatus.success ? 'alert-success' : 'alert-danger'}`}>
+                            {submitStatus.message}
+                           <button
+                            type="button"
+                            className="btn btn-sm btn-link float-end"
+                              onClick={handleOkClick}
+                              >
+                                 OK
+                           </button>
+                        </div>
+                     )}
 
-           
-
-
-        
+                    <div className="card-footer">
+                        <button className="btn btn-primary" onClick={handleSubmit}>
+                         Save
+                        </button>
+                  </div>
 
               </div>
 
@@ -499,19 +541,22 @@ setTotalOperatingExpenses(totalExpenses);
             </>
           )}
 
-<div className="text-center mt-3">
-        <button
-          className="btn btn-primary"
-          onClick={handleDisplayResult}
-        >
+        <div className="text-center mt-3">
+           <button
+              className="btn btn-primary"
+              onClick={handleDisplayResult}
+          >
           OK
-        </button>
-      </div>
-      {result && (
-        <div className="mt-4 alert alert-success">
+          </button>
+          </div>
+         {result && (
+          <div className="mt-4 alert alert-success">
           {result}
         </div>
       )}
+
+
+
 
 
         </div>

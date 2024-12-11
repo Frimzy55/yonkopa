@@ -36,6 +36,7 @@ const CollateralDetails = ({ customer, onBack, onNext, hasNext }) => {
         </div>
         <div className="card-body">
           <div className="mb-4">
+         
             <h5 className="text-primary">Lending Type</h5>
             <div className="form-check form-check-inline">
               <input
