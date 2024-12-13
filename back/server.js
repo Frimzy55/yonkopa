@@ -173,7 +173,7 @@ app.get('/search-customers', (req, res) => {
 
   // SQL query to search by first_name, last_name, or customer_id
   const query = `
-    SELECT id, customer_id, first_name, last_name ,telephone_number,date_of_birth,relationship_officer
+    SELECT id, customer_id, first_name, last_name ,telephone_number,date_of_birth,relationship_officer,residential_location,residential_gps_address
     FROM customer
     WHERE first_name LIKE ? OR last_name LIKE ? OR customer_id LIKE ?  
   `;
@@ -216,7 +216,7 @@ app.post('/loan-application', (req, res) => {
     guarantorDateOfBirth,
     
     relationshipWithClient,
-    residentialLocation,
+    guarantorLocation,
     residentialGpsAddress,
     businessType,
     businessLocation,
@@ -226,7 +226,8 @@ app.post('/loan-application', (req, res) => {
     employerName,
     yearsInService,
     monthlyNetIncome,
-    dateOfBirth
+    dateOfBirth,
+    residentialLocation
     
     
     
@@ -247,8 +248,8 @@ app.post('/loan-application', (req, res) => {
       guarantor_gender, guarantor_date_of_birth, relationship_with_client,
       residential_location, residential_gps_address, business_type, business_location,
       working_capital, years_of_operation, business_gps_address, employer_name,
-      years_in_service, monthly_net_income,date_of_birth
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)
+      years_in_service, monthly_net_income,date_of_birth,customer_location
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
   `;
 
   // Handle missing or optional fields like guarantorPhoto and payslip
@@ -271,7 +272,7 @@ app.post('/loan-application', (req, res) => {
     guarantorDateOfBirth ,
     
     relationshipWithClient ,
-    residentialLocation ,
+    guarantorLocation ,
     residentialGpsAddress ,
     businessType ,
     businessLocation ,
@@ -281,7 +282,8 @@ app.post('/loan-application', (req, res) => {
     employerName  ,
     yearsInService ,
     monthlyNetIncome ,
-    dateOfBirth
+    dateOfBirth,
+    residentialLocation,
     
     
     
@@ -300,6 +302,7 @@ app.post('/loan-application', (req, res) => {
 
 
 
+
 app.get('/loan-application', (req, res) => {
   const query = `
     SELECT 
@@ -310,7 +313,8 @@ app.get('/loan-application', (req, res) => {
       created_at, 
       amount_requested,
       date_of_birth,
-      amount_requested
+      amount_requested,
+      residential_location
       
       
     FROM loanapplication
@@ -384,6 +388,7 @@ app.post('/customer', (req, res) => {
     branch,
     region,
     amount_requested,
+    residential_location
   } = req.body;
 
   // Format the date to MySQL-compatible format
@@ -391,13 +396,13 @@ app.post('/customer', (req, res) => {
 
   const query = `
     INSERT INTO customer_details 
-    (customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, amount_requested)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    (customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, amount_requested,residential_location)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
   `;
 
   db.query(
     query,
-    [customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, amount_requested],
+    [customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, amount_requested,residential_location],
     (err, result) => {
       if (err) {
         console.error('Error inserting customer details:', err);
@@ -559,11 +564,9 @@ app.post("/api/credit", (req, res) => {
 
 app.post('/api/comments', (req, res) => {
   const { customer_id, comment } = req.body;
-
   if (!customer_id || !comment) {
     return res.status(400).json({ message: 'Customer ID and comment are required.' });
   }
-
   const query = 'INSERT INTO comments (customer_id, comment) VALUES (?, ?)';
   db.promise().query(query, [customer_id, comment])
     .then(([results]) => {
@@ -575,6 +578,122 @@ app.post('/api/comments', (req, res) => {
       res.status(500).json({ message: 'Failed to save comment. Please try again.' });
     });
 });
+
+
+app.post('/api/submit', (req, res) => {
+  // Step 1: SQL to create the temporary table
+  const createTempTableQuery = `
+  INSERT INTO debug_join_results (
+  customer_id, 
+  applicant_name, 
+  telephone_number, 
+  credit_officer, 
+  amount_requested, 
+  residential_location, 
+  cash_amount, 
+  businessType, 
+  businessLocation, 
+  comment,
+  monthlyInstallment,
+  monthlySalesRevenue,
+  grossProfit,
+  costOfGoodsSold,
+  totalOperatingExpenses,
+  netBusinessProfit,
+  householdExpensesInput,
+  otherIncomeInput,
+  loanRe ,
+  householdSurplus,
+  businessStartDate, 
+  nearestLandmark, 
+  businessDescription, 
+  currentStockValue, 
+  startedBusinessWith, 
+  sourceOfFund, 
+  principal, 
+  rate, 
+  loanTerm, 
+  loanAmount, 
+  interest
+)
+SELECT 
+  c.customer_id,
+  c.applicant_name,
+  c.telephone_number,
+  c.credit_officer,
+  c.amount_requested,
+  c.residential_location,
+  a.cash_amount,
+  b.businessType,
+  b.businessLocation,
+  co.comment,
+  b.monthlyInstallment,
+  b.monthlySalesRevenue,
+  b.grossProfit,
+  b.costOfGoodsSold,
+  b.totalOperatingExpenses,
+  b.netBusinessProfit,
+  b.householdExpensesInput,
+  b.otherIncomeInput,
+  b.loanRe ,
+  b.householdSurplus,
+  b.businessStartDate, 
+  b.nearestLandmark, 
+  b.businessDescription, 
+  b.currentStockValue, 
+  b.startedBusinessWith, 
+  b.sourceOfFund, 
+  b.principal,
+  b.rate,
+  b.loanTerm,
+  b.loanAmount,
+  b.interest
+FROM 
+  customer_details c
+  INNER JOIN cash_details a ON c.customer_id = a.customer_id
+  INNER JOIN business_loans b ON c.customer_id = b.customer_id
+  INNER JOIN comments co ON c.customer_id = co.customer_id;
+
+  `;
+
+  // Step 2: SQL to select data from the temporary table
+  //const selectQuery = `SELECT * FROM debug_join_results;`;
+
+
+  const selectQuery = `
+    SELECT 
+      c.customer_id AS customerId,
+      c.applicant_name AS fullName,
+      c.date_of_birth AS dateOfBirth,
+      c.telephone_number AS telephoneNumber,
+      c.residential_location AS residentialAddress
+    FROM 
+      customer_details c
+      INNER JOIN cash_details a ON c.customer_id = a.customer_id
+      INNER JOIN business_loans b ON c.customer_id = b.customer_id
+      INNER JOIN comments co ON c.customer_id = co.customer_id;
+  `;
+
+  // Execute the first query to create the temporary table
+  db.query(createTempTableQuery, (err) => {
+    if (err) {
+      console.error('Error creating temporary table:', err);
+      return res.status(500).send('Error creating temporary table');
+    }
+
+    // Execute the second query to fetch data from the temporary table
+    db.query(selectQuery, (err, results) => {
+      if (err) {
+        console.error('Error fetching data from temporary table:', err);
+        return res.status(500).send('Error fetching data from temporary table');
+      }
+
+      // Send the results back to the frontend
+      res.status(200).json(results);
+    });
+  });
+});
+
 
 
 // Server listening on port 5002

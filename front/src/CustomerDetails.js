@@ -32,6 +32,7 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
         branch: customer.branch,
         region: customer.region,
         amount_requested: customer.amount_requested,
+        residential_location: customer.residential_location
       });
 
       // Update status with success message
@@ -117,7 +118,13 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
               <div className="row mb-2">
                 <div className="col-sm-6 font-weight-bold">Amount Requested:</div>
                 <div className="col-sm-6">{customer.amount_requested}</div>
+                
               </div>
+              <div className="row mb-2">
+                <div className="col-sm-6 font-weight-bold">Residential:</div>
+                <div className="col-sm-6">{customer.residential_location}</div>
+              </div>
+              
             </div>
           </div>
           {/* Render Status Message */}

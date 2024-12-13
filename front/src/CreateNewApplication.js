@@ -28,7 +28,7 @@ const CreateNewApplication = () => {
     guarantorGender: Yup.string().required('Gurantor gender is required'),
     guarantorDateOfBirth: Yup.date().required('Gurantor date of birth is required'),
     relationshipWithClient: Yup.string().required('relationship with client is required'),
-    residentialLocation: Yup.string().required('residential location  is required'),
+    guarantorLocation: Yup.string().required('residential location  is required'),
     residentialGpsAddress: Yup.string().required('residential address is required'),
     businessType: Yup.string().required('business type  is required'),
     businessLocation: Yup.string().required('business loaction  is required'),
@@ -65,7 +65,7 @@ const CreateNewApplication = () => {
       guarantorDateOfBirth: '',
       guarantorPhoto: null,
       relationshipWithClient: '',
-      residentialLocation: '',
+      guarantorLocation: '',
       residentialGpsAddress: '',
       businessType: '',
       businessLocation: '',
@@ -77,6 +77,7 @@ const CreateNewApplication = () => {
       monthlyNetIncome: '',
       payslip: null,
       dateOfBirth:'',
+      residentialLocation:''
       
     },
     validationSchema,
@@ -111,6 +112,8 @@ const CreateNewApplication = () => {
     formik.setFieldValue('lastName', customer.last_name);
     formik.setFieldValue('telephoneNumber', customer.telephone_number);
     formik.setFieldValue('dateOfBirth', formatDate(customer.date_of_birth));  // Add this line
+    formik.setFieldValue('residentialLocation',customer.residential_location);
+    formik.setFieldValue('residentialGpsAddress',customer.residential_gps_address);
   };
 
 
@@ -215,6 +218,24 @@ const CreateNewApplication = () => {
                   ) : null}
                 </div>
               </div>
+
+              <div className="col-md-3">
+                <div className="form-group">
+                  <label>Customer Residential Address</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="residentialLocation"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.residentialLocation}
+                  />
+                  {formik.touched.residentialLocation && formik.errors.residentialLocation ? (
+                    <div className="text-danger">{formik.errors.residentialLocation}</div>
+                  ) : null}
+                </div>
+              </div>
+
 
               <div className="col-md-3">
                 <div className="form-group">
@@ -463,17 +484,17 @@ const CreateNewApplication = () => {
 
               <div className="col-md-3">
                 <div className="form-group">
-                  <label>Residential Location</label>
+                  <label>Gurantor Residential Location</label>
                   <input
                     type="text"
                     className="form-control"
-                    name="residentialLocation"
+                    name="guarantorLocation"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.residentialLocation}
+                    value={formik.values.guarantorLocation}
                   />
-                  {formik.touched.residentialLocation && formik.errors.residentialLocation ? (
-                    <div className="text-danger">{formik.errors.residentialLocation}</div>
+                  {formik.touched.guarantorLocation && formik.errors.guarantorLocation ? (
+                    <div className="text-danger">{formik.errors.guarantorLocation}</div>
                   ) : null}
                 </div>
               </div>

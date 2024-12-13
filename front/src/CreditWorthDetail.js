@@ -275,7 +275,7 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
               </div>
 
               <div className="row">
-              <h5 className="text-primary">Customer ID: {customer.customer_id}</h5>
+              <h5 className="text-white">Customer ID: {customer.customer_id}</h5>
                 <div className="col-md-6 mb-4">
                   <label htmlFor="businessLocation" className="form-label text-primary">Business Location</label>
                   <input
@@ -542,12 +542,7 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
           )}
 
         <div className="text-center mt-3">
-           <button
-              className="btn btn-primary"
-              onClick={handleDisplayResult}
-          >
-          OK
-          </button>
+           
           </div>
          {result && (
           <div className="mt-4 alert alert-success">

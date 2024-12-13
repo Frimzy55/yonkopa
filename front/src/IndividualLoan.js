@@ -34,7 +34,7 @@ const IndividualLoan = () => {
 
   const handleSearch = () => {
     const filtered = loanApplications.filter((application) =>
-      ['customer_id', 'applicant_name', 'telephone_number', 'credit_officer', 'created_at', 'amount_requested'].some((field) =>
+      ['customer_id', 'applicant_name', 'telephone_number', 'credit_officer', 'created_at', 'amount_requested','residential_location'].some((field) =>
         application[field]
           ? application[field].toString().replace(/[\$,]/g, '').toLowerCase().includes(searchTerm.toLowerCase())
           : false
@@ -190,6 +190,7 @@ const IndividualLoan = () => {
                   <th className="text-primary">Credit Officer</th>
                   <th className="text-primary">Application Date</th>
                   <th className="text-primary">Loan Amount</th>
+                  
                 </tr>
               </thead>
               <tbody>
@@ -216,6 +217,7 @@ const IndividualLoan = () => {
                       <td>{application.credit_officer}</td>
                       <td>{formatDate(application.created_at)}</td>
                       <td>{application.amount_requested}</td>
+                      
                     </tr>
                   ))
                 ) : (

@@ -1,76 +1,127 @@
 import React, { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import './App1.css';
 
 const Assessment = () => {
   const [customers, setCustomers] = useState([]);
-  const [loading, setLoading] = useState(true); // To manage loading state
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('bio'); // Default to 'bio'
 
-  // Fetch customer data from an external API or source
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
-        const response = await fetch('https://api.example.com/customers'); // Replace with your API endpoint
+        const response = await fetch('http://localhost:5001/api/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
+
         const data = await response.json();
-        console.log('Fetched customer data:', data); // Log data to check if it was fetched correctly
-        setCustomers(data); // Set the fetched data into state
+        setCustomers(data);
       } catch (error) {
         console.error('Error fetching customer data:', error);
       } finally {
-        setLoading(false); // Set loading to false after data is fetched
+        setLoading(false);
       }
     };
 
     fetchCustomerData();
-  }, []); // Empty dependency array means this will run once when the component mounts
+  }, []);
 
-  console.log('Customers state:', customers); // Log the customers state to check if data is set
+  const menuItems = [
+    { key: 'bio', label: 'Bio Information' },
+    { key: 'loan', label: 'Loan Information' },
+    { key: 'info', label: 'Guarantor Information' },
+    { key: 'credit', label: 'Credit Assessment' },
+    { key: 'app', label: 'Approval and Comment' },
+  ];
+
+  const getCategoryColumns = () => {
+    switch (selectedCategory) {
+      case 'bio':
+        return ['customerId', 'fullName', 'dateOfBirth', 'telephoneNumber', 'residentialAddress'];
+      case 'loan':
+        return ['businessStartDate','nearestLandMark', 'businessDescription','currentStockValue', 'startedBusinessWith', 'sourcefund', 'principal','rate','loanTerm','loanAmount','interest'];
+      case 'info':
+        return ['guarantorName', 'relationship', 'guarantorTelephone', 'guarantorAddress'];
+      case 'credit':
+        return ['creditOfficer', 'monthlyInstallment', 'grossProfit', 'netBusinessProfit'];
+      case 'app':
+        return ['comment'];
+      default:
+        return [];
+    }
+  };
+
+  const filteredColumns = getCategoryColumns();
 
   return (
-    <div className="container mt-4" style={{ transform: 'scale(0.6)', transformOrigin: 'top center' }}>
-      <h3>Customer Assessment</h3>
-      {/* If loading, show loading message */}
-      {loading ? (
-        <div className="alert alert-info">Loading customer data...</div>
-      ) : (
-        <>
-          {/* Table always visible */}
-          <div className="table-responsive">
-            <table className="table table-bordered table-striped mt-4">
-              <thead>
-                <tr>
-                  <th>Customer ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Date of Birth</th>
-                  <th>Telephone Number</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* Check if there is customer data */}
-                {customers.length === 0 ? (
-                  <tr>
-                    <td colSpan="5" className="text-center text-muted">
-                      No customer data available
-                    </td>
-                  </tr>
-                ) : (
-                  customers.map((customer) => (
-                    <tr key={customer.customerId}>
-                      <td>{customer.customerId}</td>
-                      <td>{customer.firstName}</td>
-                      <td>{customer.lastName}</td>
-                      <td>{customer.dateOfBirth}</td>
-                      <td>{customer.telephoneNumber}</td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+    <div className="container-fluid mt-4" style={{ transform: 'scale(0.8)', transformOrigin: 'top center' }}>
+      <div className="row">
+        {/* Sidebar */}
+        <div className="col-md-3">
+          <div className="card">
+            <div className="card-header bg-white text-primary">
+              <h5 className="mb-0">Menu</h5>
+            </div>
+            <ul className="list-group list-group-flush">
+              {menuItems.map((item) => (
+                <li
+                  key={item.key}
+                  className={`list-group-item ${selectedCategory === item.key ? 'active text-white bg-secondary' : ''} 
+                              ${selectedCategory !== item.key ? 'list-group-item-action' : ''}`}
+                  onClick={() => setSelectedCategory(item.key)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {item.label}
+                </li>
+              ))}
+            </ul>
           </div>
-        </>
-      )}
+        </div>
+
+        {/* Main Content */}
+        <div className="col-md-9">
+          <div className="card">
+            <div className="card-header bg-white text-primary">
+              <h5 className="mb-0">{menuItems.find((item) => item.key === selectedCategory)?.label}</h5>
+            </div>
+            <div className="card-body">
+              {loading ? (
+                <div className="alert alert-info text-center">Loading customer data...</div>
+              ) : customers.length === 0 ? (
+                <div className="alert alert-warning text-center">No customer data available</div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="table table-striped table-hover">
+                    <thead className="thead-dark">
+                      <tr>
+                        {filteredColumns.map((col) => (
+                          <th key={col}>{col}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {customers.map((customer, index) => (
+                        <tr key={index} className="table-row-hover">
+                          {filteredColumns.map((col) => (
+                            <td key={col}>{customer[col]}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

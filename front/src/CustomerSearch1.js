@@ -114,7 +114,11 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
                     <th>Last Name</th>
                     <th>Contact</th>
                     <th>Date of Birth</th>
-                    <th>Elapsed Time</th>
+                  
+                    
+                    <th>Residential_location</th>
+                    <th>Residential_gps_address</th>
+                   
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -127,7 +131,9 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
                       <td>{customer.last_name || 'N/A'}</td>
                       <td>{customer.telephone_number || 'N/A'}</td>
                       <td>{formatDate(customer.date_of_birth) || 'N/A'}</td>
-                      <td>{calculateElapsedTime(customer.updated_at) || 'N/A'}</td>
+                      
+                      <td>{customer.residential_location || 'NA'}</td>
+                      <td>{customer.residential_gps_address || 'NA'}</td>
                       <td>
                         <button
                           onClick={() => handleSelectCustomer(customer)}
