@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import ImageUploader from './ImageUploader';
+import MaterialImageUploader from './MaterialImageUploader';
 
 const CustomerRegistration = () => {
   const [submitStatus, setSubmitStatus] = useState(null);
@@ -97,11 +100,22 @@ const CustomerRegistration = () => {
 
   return (
     <form onSubmit={formik.handleSubmit} className="container mt-2">
+
       <h1 className="mb-4">Customer Registration Form</h1>
        {/* Show submit status message */}
+
+        {/* Image Uploader */}
+        <div className="row">
+        <div className="col-md-12 mb-3">
+          <label>Profile Picture</label>
+          <MaterialImageUploader />
+        </div>
+      </div>
+      
        
 
       <div className="row">
+      
         {/* Title */}
         <div className="col-md-2 mb-2">
           <label>Title</label>
@@ -167,6 +181,9 @@ const CustomerRegistration = () => {
           )}
         </div>
       </div>
+
+      
+
 
       <div className="row">
         {/* Date of Birth */}
@@ -366,6 +383,8 @@ const CustomerRegistration = () => {
         </div>
       </div>
 
+      
+
       <div className="row">
         {/* Residential GPS Address */}
         <div className="col-md-2 mb-3">
@@ -503,6 +522,12 @@ const CustomerRegistration = () => {
           )}
         </div>
       </div>
+
+       {/* Image Uploader */}
+       
+         
+        
+      
 
       {submitStatus && (
         <div className={`alert ${submitStatus.success ? 'alert-success' : 'alert-danger'}`}>

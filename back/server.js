@@ -217,7 +217,7 @@ app.post('/loan-application', (req, res) => {
     
     relationshipWithClient,
     guarantorLocation,
-    residentialGpsAddress,
+    guarantorResidentialGpsAddress,
     businessType,
     businessLocation,
     workingCapital,
@@ -227,7 +227,8 @@ app.post('/loan-application', (req, res) => {
     yearsInService,
     monthlyNetIncome,
     dateOfBirth,
-    residentialLocation
+    residentialLocation,
+    residentialGpsAddress
     
     
     
@@ -248,8 +249,8 @@ app.post('/loan-application', (req, res) => {
       guarantor_gender, guarantor_date_of_birth, relationship_with_client,
       residential_location, residential_gps_address, business_type, business_location,
       working_capital, years_of_operation, business_gps_address, employer_name,
-      years_in_service, monthly_net_income,date_of_birth,customer_location
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?)
+      years_in_service, monthly_net_income,date_of_birth,customer_location,customer_gps_address
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)
   `;
 
   // Handle missing or optional fields like guarantorPhoto and payslip
@@ -273,7 +274,7 @@ app.post('/loan-application', (req, res) => {
     
     relationshipWithClient ,
     guarantorLocation ,
-    residentialGpsAddress ,
+    guarantorResidentialGpsAddress ,
     businessType ,
     businessLocation ,
     workingCapital ,
@@ -284,6 +285,7 @@ app.post('/loan-application', (req, res) => {
     monthlyNetIncome ,
     dateOfBirth,
     residentialLocation,
+    residentialGpsAddress,
     
     
     
@@ -314,7 +316,17 @@ app.get('/loan-application', (req, res) => {
       amount_requested,
       date_of_birth,
       amount_requested,
-      residential_location
+      customer_location,
+      customer_gps_address,
+
+      guarantor_name,
+      guarantor_nationality,
+      guarantor_gender,
+      guarantor_date_of_birth,
+      relationship_with_client,
+      residential_location,
+      residential_gps_address
+      
       
       
     FROM loanapplication
@@ -388,7 +400,15 @@ app.post('/customer', (req, res) => {
     branch,
     region,
     amount_requested,
-    residential_location
+    customer_location,
+    customer_gps_address,
+    guarantor_name,
+    guarantor_nationality,
+    guarantor_gender,
+    guarantor_date_of_birth,
+    relationship_with_client,
+    residential_location,
+    residential_gps_address
   } = req.body;
 
   // Format the date to MySQL-compatible format
@@ -396,13 +416,17 @@ app.post('/customer', (req, res) => {
 
   const query = `
     INSERT INTO customer_details 
-    (customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, amount_requested,residential_location)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
+    (customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, 
+    amount_requested,customer_location,customer_gps_address,guarantor_name,guarantor_nationality,
+    guarantor_gender,guarantor_date_of_birth,relationship_with_client,residential_location,residential_gps_address)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)
   `;
 
   db.query(
     query,
-    [customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, amount_requested,residential_location],
+    [customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, 
+      region, amount_requested,customer_location,customer_gps_address,guarantor_name,
+      guarantor_nationality,guarantor_gender,guarantor_date_of_birth,relationship_with_client,residential_location,residential_gps_address],
     (err, result) => {
       if (err) {
         console.error('Error inserting customer details:', err);
@@ -468,7 +492,7 @@ app.post('/api/vehicle', (req, res) => {
 app.post('/api/build', (req, res) => {
   const { customer_id, blocation, blandTitle, bmarketValue, bltvRatio, bnearestLandmark, bdigitalAddress, bforcedSaleValue, bltvRatioPlus10 } = req.body;
 
-  const query = `INSERT INTO build_details (customer_id, location, land_title, market_value, ltv_ratio, nearest_landmark, digital_address, forced_sale_value, ltv_ratio_plus_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `INSERT INTO build_details (customer_id, location, land_title, market_value, Itv_ratio, nearest_landmark, digital_address, forced_sale_value, Itv_ratio_plus_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const values = [customer_id, blocation, blandTitle, bmarketValue, bltvRatio, bnearestLandmark, bdigitalAddress, bforcedSaleValue, bltvRatioPlus10];
 
@@ -583,47 +607,17 @@ app.post('/api/comments', (req, res) => {
 app.post('/api/submit', (req, res) => {
   // Step 1: SQL to create the temporary table
   const createTempTableQuery = `
-  INSERT INTO debug_join_results (
-  customer_id, 
-  applicant_name, 
-  telephone_number, 
-  credit_officer, 
-  amount_requested, 
-  residential_location, 
-  cash_amount, 
-  businessType, 
-  businessLocation, 
-  comment,
-  monthlyInstallment,
-  monthlySalesRevenue,
-  grossProfit,
-  costOfGoodsSold,
-  totalOperatingExpenses,
-  netBusinessProfit,
-  householdExpensesInput,
-  otherIncomeInput,
-  loanRe ,
-  householdSurplus,
-  businessStartDate, 
-  nearestLandmark, 
-  businessDescription, 
-  currentStockValue, 
-  startedBusinessWith, 
-  sourceOfFund, 
-  principal, 
-  rate, 
-  loanTerm, 
-  loanAmount, 
-  interest
-)
+  
+
 SELECT 
   c.customer_id,
   c.applicant_name,
   c.telephone_number,
   c.credit_officer,
   c.amount_requested,
-  c.residential_location,
-  a.cash_amount,
+  c.customer_location,
+  c.customer_gps_address,
+  a.cash_amount,  
   b.businessType,
   b.businessLocation,
   co.comment,
@@ -645,19 +639,45 @@ SELECT
   b.sourceOfFund, 
   b.principal,
   b.rate,
+  b.grossMarginInput,
+  b.grossProfit,
+  b.costOfGoodsSold,
+  b.totalOperatingExpenses,
+  b.netBusinessProfit,
+  b.householdExpensesInput,
+  b.otherIncomeInput,
+  b.loanRe,
+  b.householdSurplus,
   b.loanTerm,
   b.loanAmount,
-  b.interest
+  b.interest,
+  bu.location,  -- Added build_details columns
+  bu.land_title,
+  bu.market_value,
+  bu.Itv_ratio,
+  bu.Itv_ratio_plus_10,
+  
+  bu.nearest_landmark,
+  bu.digital_address,
+  bu.forced_sale_value,
+  v.brand,
+  v.chassis_number,
+  v.model_year,
+  v.market_value,
+  V.model,
+  v.registration_number,
+  v.mileage,
+  v.forced_sale_value
+  
 FROM 
   customer_details c
-  INNER JOIN cash_details a ON c.customer_id = a.customer_id
+  
   INNER JOIN business_loans b ON c.customer_id = b.customer_id
-  INNER JOIN comments co ON c.customer_id = co.customer_id;
-
+  INNER JOIN comments co ON c.customer_id = co.customer_id
+  LEFT JOIN build_details bu ON c.customer_id = bu.customer_id-- Added LEFT JOIN for build_details
+  LEFT JOIN vehicle_details v ON c.customer_id = v.customer_id
+  LEFT JOIN cash_details a ON c.customer_id = a.customer_id;
   `;
-
-  // Step 2: SQL to select data from the temporary table
-  //const selectQuery = `SELECT * FROM debug_join_results;`;
 
 
   const selectQuery = `
@@ -666,12 +686,50 @@ FROM
       c.applicant_name AS fullName,
       c.date_of_birth AS dateOfBirth,
       c.telephone_number AS telephoneNumber,
-      c.residential_location AS residentialAddress
+      c.customer_location AS residentialAddress,
+      c.customer_gps_address AS gpsAddress,
+       c.amount_requested AS amountRequested,
+      b.principal AS principal,
+       b.businessType AS businessType,
+       b.businessLocation AS businessLocation,
+       b.monthlyInstallment AS monthlyInstallment,
+       b.monthlySalesRevenue AS monthlySalesRevenue,
+        b.businessStartDate AS businessStartDate,
+        b.nearestLandmark AS nearestLandmark,
+        b.businessDescription AS businessDescription,
+         b.currentStockValue AS currentStockValue,
+         b.startedBusinessWith AS startedBusinessWith,
+         b.sourceOfFund AS sourceOfFund,
+         b.rate AS rate,
+         b.loanTerm AS loanTerm,
+         b.loanAmount AS loanAmount,
+         b.interest AS interest,
+         b.householdSurplus AS householdSurplus ,
+         b.grossMarginInput AS grossMarginInput,
+         b.grossProfit AS grossProfit,
+         b.costOfGoodsSold AS costOfGoodsSold,
+         b.totalOperatingExpenses AS totalOperatingExpenses,
+         b.netBusinessProfit AS netBusinessProfit,
+         b.householdExpensesInput AS householdExpenseInput,
+         b.otherIncomeInput AS otherIncomeInput,
+         b.loanRe AS loanReccomendation ,
+         co.comment AS comment,
+         bu.location AS location,
+         bu.land_title AS landTitle,
+         bu.market_value AS marketValue,
+         bu.Itv_ratio AS Itv_ratio,
+         bu.Itv_ratio_plus_10 AS Itv_ratio_plus_10,
+         bu.nearest_landmark AS nearest_landmark,
+        bu.digital_address AS digitalAddress,
+        bu.forced_sale_value AS forceSale,
+         a.cash_amount AS cashAmount
     FROM 
       customer_details c
-      INNER JOIN cash_details a ON c.customer_id = a.customer_id
+      LEFT JOIN cash_details a ON c.customer_id = a.customer_id
       INNER JOIN business_loans b ON c.customer_id = b.customer_id
-      INNER JOIN comments co ON c.customer_id = co.customer_id;
+      INNER JOIN comments co ON c.customer_id = co.customer_id
+      LEFT JOIN vehicle_details v ON c.customer_id = v.customer_id
+      LEFT JOIN build_details bu ON c.customer_id = bu.customer_id; 
   `;
 
   // Execute the first query to create the temporary table

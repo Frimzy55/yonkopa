@@ -143,7 +143,7 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
   };
 
   const handleSubmit = async () => {
-    try {
+   // try {
       const payload = {
         customer_id: customer.customer_id,
         isCreditworthy,
@@ -164,7 +164,6 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
         monthlyInstallment,
         monthlySalesRevenue,
         grossMarginInput,
-        //handleSalesRevenueChange,
         grossProfit,
         costOfGoodsSold,
         totalOperatingExpenses,
@@ -173,23 +172,20 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
         otherIncomeInput,
         loanRe,
         householdSurplus,
-        //surplus,
-        //result
-
       };
   
-      const response = await axios.post('http://localhost:5001/api/credit', payload);
-      if (response.status === 200) {
-        //alert('Data saved successfully!');
-        setSubmitStatus({ success: true, message: 'Form submitted successfully!' });
-      }
+      console.log('Payload:', payload); // Debugging: Ensure the payload is as expected
+    try {
+      await axios.post('http://localhost:5001/api/credit', payload);
+  
+      // If no error, assume success
+      setSubmitStatus({ success: true, message: 'Form submitted successfully!' });
     } catch (error) {
-      console.error('Error saving data:', error);
-      //alert('Failed to save data. Please try again.');
+      console.error('Error saving data:', error.response || error.message);
       setSubmitStatus({ danger: false, message: 'Error submitting form. Please try again.' });
     }
   };
-
+  
 
   const handleOkClick = () => {
     setSubmitStatus(null);
@@ -561,9 +557,3 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
 };
 
 export default CreditWorthDetail;
-
-
-
-
-
-

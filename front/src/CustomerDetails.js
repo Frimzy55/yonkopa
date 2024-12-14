@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import moment from 'moment';
 import { FaUser } from 'react-icons/fa'; // Import the user icon from react-icons
@@ -22,6 +22,7 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
     try {
       // Reformat the date_of_birth to 'YYYY-MM-DD'
       const formattedDate = moment(customer.date_of_birth).format('YYYY-MM-DD');
+      const formattedDate1 = moment(customer.guarantor_date_of_birth).format('YYYY-MM-DD');
 
       const response = await axios.post('http://localhost:5001/customer', {
         customer_id: customer.customer_id,
@@ -32,7 +33,18 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
         branch: customer.branch,
         region: customer.region,
         amount_requested: customer.amount_requested,
-        residential_location: customer.residential_location
+        customer_location: customer.customer_location,
+        customer_gps_address: customer.customer_gps_address,
+        guarantor_name:customer.guarantor_name,
+        guarantor_date_of_birth:formattedDate1,
+        guarantor_gender:customer.guarantor_gender,
+        relationship_with_client:customer.relationship_with_client,
+        residential_location:customer.residential_location,
+        residential_gps_address:customer.residential_gps_address,
+        guarantor_nationality:customer.guarantor_nationality
+        
+
+
       });
 
       // Update status with success message
@@ -84,19 +96,19 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
             {/* Left Column */}
             <div className="col-sm-6">
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Customer ID:</div>
+                <div className="col-sm-6" style={{ fontWeight: "bold" }}>Customer ID:</div>
                 <div className="col-sm-6">{customer.customer_id}</div>
               </div>
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Full Name:</div>
+                <div className="col-sm-6" style={{ fontWeight: "bold" }}>Applicant Name:</div>
                 <div className="col-sm-6">{customer.applicant_name}</div>
               </div>
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Telephone Number:</div>
+                <div className="col-sm-6" style={{ fontWeight: "bold" }}>Telephone Number:</div>
                 <div className="col-sm-6">{customer.telephone_number}</div>
               </div>
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Credit Officer:</div>
+                <div className="col-sm-6" style={{ fontWeight: "bold" }}>Credit Officer:</div>
                 <div className="col-sm-6">{customer.credit_officer}</div>
               </div>
             </div>
@@ -104,28 +116,39 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
             {/* Right Column */}
             <div className="col-sm-6">
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Date of Birth:</div>
+                <div className="col-sm-6" style={{ fontWeight: "bold" }}>Date of Birth:</div>
                 <div className="col-sm-6">{formatDate(customer.date_of_birth)}</div>
               </div>
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Branch:</div>
+                <div className="col-sm-6" style={{ fontWeight: "bold" }}>Branch:</div>
                 <div className="col-sm-6">{customer.branch}</div>
               </div>
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Region:</div>
+                <div className="col-sm-6" style={{ fontWeight: "bold" }}>Region:</div>
                 <div className="col-sm-6">{customer.region}</div>
               </div>
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Amount Requested:</div>
+                <div className="col-sm-6" style={{ fontWeight: "bold" }}>Amount Requested:</div>
                 <div className="col-sm-6">{customer.amount_requested}</div>
-                
               </div>
               <div className="row mb-2">
-                <div className="col-sm-6 font-weight-bold">Residential:</div>
-                <div className="col-sm-6">{customer.residential_location}</div>
+                <div className="col-sm-6 font-weight-bold text-white">Residential Location:</div>
+                <div className="col-sm-6 text-white">{customer.customer_location}</div>
               </div>
-              
+              <div className="row mb-2">
+                <div className="col-sm-6 font-weight-bold text-white">Residential GPS Address:</div>
+                <div className="col-sm-6 text-white">{customer.customer_gps_address}</div>
+              </div>
             </div>
+            <div className="row mb-2">
+                <div className="col-sm-6 text-primary">{customer.guarantor_name}</div>
+                <div className="col-sm-6 text-primary">{customer.relationship_with_client}</div>
+                <div className="col-sm-6 text-primary">{customer.guarantor_gender}</div>
+                <div className="col-sm-6 text-primary">{customer.residential_location}</div>
+                <div className="col-sm-6 text-primary">{customer.residential_gps_address}</div>
+                <div className="col-sm-6 text-primary">{customer.guarantor_nationality}</div>
+                <div className="col-sm-6 text-primary">{formatDate(customer.guarantor_date_of_birth)}</div>
+              </div>
           </div>
           {/* Render Status Message */}
           {renderStatusMessage()}

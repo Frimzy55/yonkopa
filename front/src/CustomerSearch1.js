@@ -117,7 +117,8 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
                   
                     
                     <th>Residential_location</th>
-                    <th>Residential_gps_address</th>
+                    <th>Residential_Gps_Address</th>
+                   
                    
                     <th>Actions</th>
                   </tr>
@@ -134,6 +135,7 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
                       
                       <td>{customer.residential_location || 'NA'}</td>
                       <td>{customer.residential_gps_address || 'NA'}</td>
+                     
                       <td>
                         <button
                           onClick={() => handleSelectCustomer(customer)}

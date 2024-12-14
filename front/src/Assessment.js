@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
 import './App1.css';
 
+
 const Assessment = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,9 +45,13 @@ const Assessment = () => {
   const getCategoryColumns = () => {
     switch (selectedCategory) {
       case 'bio':
-        return ['customerId', 'fullName', 'dateOfBirth', 'telephoneNumber', 'residentialAddress'];
+        return ['customerId', 'fullName', 'dateOfBirth', 'telephoneNumber', 'residentialAddress','gpsAddress'];
       case 'loan':
-        return ['businessStartDate','nearestLandMark', 'businessDescription','currentStockValue', 'startedBusinessWith', 'sourcefund', 'principal','rate','loanTerm','loanAmount','interest'];
+        return ['amountRequested','businessType','businessLocation','businessStartDate','nearestLandmark', 'businessDescription','currentStockValue',
+           'startedBusinessWith', 'sourceOfFund', 'principal','rate','loanTerm','loanAmount',
+           'interest','monthlyInstallment','monthlySalesRevenue','cashAmount','householdSurplus','grossMarginInput','grossProfit','costOfGoodsSold',
+           'totalOperatingExpenses','netBusinessProfit','householdExpenseInput','otherIncomeInput','loanReccomendation','location','landTitle',
+           'marketValue','Itv_ratio','Itv_ratio_plus_10','nearest_landmark','digitalAddress','forceSale','comment'];
       case 'info':
         return ['guarantorName', 'relationship', 'guarantorTelephone', 'guarantorAddress'];
       case 'credit':
@@ -60,8 +65,10 @@ const Assessment = () => {
 
   const filteredColumns = getCategoryColumns();
 
+  
+
   return (
-    <div className="container-fluid mt-4" style={{ transform: 'scale(0.8)', transformOrigin: 'top center' }}>
+    <div className="container-fluid mt-4" style={{ transform: 'scale(0.9)', transformOrigin: 'top center' }}>
       <div className="row">
         {/* Sidebar */}
         <div className="col-md-3">

@@ -29,7 +29,7 @@ const CreateNewApplication = () => {
     guarantorDateOfBirth: Yup.date().required('Gurantor date of birth is required'),
     relationshipWithClient: Yup.string().required('relationship with client is required'),
     guarantorLocation: Yup.string().required('residential location  is required'),
-    residentialGpsAddress: Yup.string().required('residential address is required'),
+    guarantorResidentialGpsAddress: Yup.string().required('residential address is required'),
     businessType: Yup.string().required('business type  is required'),
     businessLocation: Yup.string().required('business loaction  is required'),
     workingCapital: Yup.number().required('working capital is required'),
@@ -66,7 +66,7 @@ const CreateNewApplication = () => {
       guarantorPhoto: null,
       relationshipWithClient: '',
       guarantorLocation: '',
-      residentialGpsAddress: '',
+      guarantorResidentialGpsAddress: '',
       businessType: '',
       businessLocation: '',
       workingCapital: '',
@@ -77,7 +77,8 @@ const CreateNewApplication = () => {
       monthlyNetIncome: '',
       payslip: null,
       dateOfBirth:'',
-      residentialLocation:''
+      residentialLocation:'',
+      residentialGpsAddress:''
       
     },
     validationSchema,
@@ -232,6 +233,23 @@ const CreateNewApplication = () => {
                   />
                   {formik.touched.residentialLocation && formik.errors.residentialLocation ? (
                     <div className="text-danger">{formik.errors.residentialLocation}</div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="col-md-3">
+                <div className="form-group">
+                  <label>Customer Residential Gps Address</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="residentialGpsAddress"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.residentialGpsAddress}
+                  />
+                  {formik.touched.residentialGpsAddress && formik.errors.residentialGpsAddress ? (
+                    <div className="text-danger">{formik.errors.residentialGpsAddress}</div>
                   ) : null}
                 </div>
               </div>
@@ -505,13 +523,13 @@ const CreateNewApplication = () => {
                   <input
                     type="text"
                     className="form-control"
-                    name="residentialGpsAddress"
+                    name="guarantorResidentialGpsAddress"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.residentialGpsAddress}
+                    value={formik.values.guarantorResidentialGpsAddress}
                   />
-                  {formik.touched.residentialGpsAddress && formik.errors.residentialGpsAddress ? (
-                    <div className="text-danger">{formik.errors.residentialGpsAddress}</div>
+                  {formik.touched.guarantorResidentialGpsAddress && formik.errors.guarantorResidentialGpsAddress ? (
+                    <div className="text-danger">{formik.errors.guarantorResidentialGpsAddress}</div>
                   ) : null}
                 </div>
               </div>
