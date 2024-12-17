@@ -5,6 +5,8 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 //const mysql = require('mysql2');
 const pool = require('./db'); // Adjust path as needed
+const cron = require('node-cron');
+//const { Customer } = require('./models');
 
 
 // Create a pool
@@ -439,6 +441,11 @@ app.post('/customer', (req, res) => {
 
 
 
+      
+      
+
+    
+
 app.post('/api/land', (req, res) => {
   const {
     customer_id,
@@ -472,6 +479,8 @@ app.post('/api/land', (req, res) => {
 });
 
 
+
+
 app.post('/api/vehicle', (req, res) => {
   const { customer_id, vbrand, vchasiss, vmodelyeaar, vmarket, vltvRatio, vmodel, vregister, vmileage, vforcedSaleValue, vltvRatioPlus10 } = req.body;
 
@@ -487,7 +496,6 @@ app.post('/api/vehicle', (req, res) => {
     res.status(200).send('Vehicle details added successfully');
   });
 });
-
 
 app.post('/api/build', (req, res) => {
   const { customer_id, blocation, blandTitle, bmarketValue, bltvRatio, bnearestLandmark, bdigitalAddress, bforcedSaleValue, bltvRatioPlus10 } = req.body;
@@ -505,7 +513,6 @@ app.post('/api/build', (req, res) => {
   });
 });
 
-
 app.post('/api/cash', (req, res) => {
   const { customer_id, cash_amount } = req.body;
 
@@ -521,8 +528,6 @@ app.post('/api/cash', (req, res) => {
     res.status(200).send('Cash data added successfully');
   });
 });
-
-
 
 
 
@@ -586,6 +591,7 @@ app.post("/api/credit", (req, res) => {
   });
 });
 
+
 app.post('/api/comments', (req, res) => {
   const { customer_id, comment } = req.body;
   if (!customer_id || !comment) {
@@ -604,6 +610,7 @@ app.post('/api/comments', (req, res) => {
 });
 
 
+
 app.post('/api/submit', (req, res) => {
   // Step 1: SQL to create the temporary table
   const createTempTableQuery = `
@@ -617,6 +624,9 @@ SELECT
   c.amount_requested,
   c.customer_location,
   c.customer_gps_address,
+  c.guarantor_name,
+  c.residential_location,
+  c.residential_gps_address,
   a.cash_amount,  
   b.businessType,
   b.businessLocation,
@@ -689,6 +699,9 @@ FROM
       c.customer_location AS residentialAddress,
       c.customer_gps_address AS gpsAddress,
        c.amount_requested AS amountRequested,
+       c.guarantor_name AS guarantorName,
+       c.residential_location AS guarantorResidential,
+       c.residential_gps_address AS guarantorGpsAddress,
       b.principal AS principal,
        b.businessType AS businessType,
        b.businessLocation AS businessLocation,
@@ -751,6 +764,50 @@ FROM
     });
   });
 });
+
+
+
+
+app.post('/check-id-number', (req, res) => {
+  const { idNumber } = req.body;
+
+  const query = `SELECT id FROM customer WHERE id_number = ?`;
+  
+  db.execute(query, [idNumber], (err, results) => {
+    if (err) {
+      console.error('Error querying database:', err);
+      return res.status(500).json({ error: 'Server error' });
+    }
+
+    if (results.length > 0) {
+      return res.json({ isUnique: false });  // ID is already in use
+    }
+
+    return res.json({ isUnique: true });  // ID is unique
+  });
+});
+
+
+app.get('/get-loan-cycle-count/:customerId', (req, res) => {
+  const customerId = req.params.customerId;
+
+  // Logic to retrieve loan cycle count from the database
+  const query = `SELECT COUNT(*) AS loanCycleCount FROM loanapplication WHERE customer_id = ?`;
+  
+  db.query(query, [customerId], (err, result) => {
+    if (err) {
+      return res.status(500).send({ message: 'Error retrieving loan cycle count' });
+    }
+
+    let loanCycleCount = result[0].loanCycleCount || 1; // Default to 1 if no cycles found
+
+    // Increase the loan cycle count by 1
+    loanCycleCount++;
+
+    res.send({ loanCycleCount });
+  });
+});
+
 
 
 

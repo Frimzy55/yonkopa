@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-//import { useLocation } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 import logo from './image/yonko.png';
@@ -7,8 +6,9 @@ import CustomerRegistration from './CustomerRegistration';
 import CustomerSearch from './CustomerSearch';
 import CreateNewApplication from './CreateNewApplication';
 import IndividualLoan from './IndividualLoan';
-import { FaUserCircle } from 'react-icons/fa'; 
+import { FaUserCircle } from 'react-icons/fa';
 import { MdAssessment } from 'react-icons/md';
+import ChangePassword from './ChangePassword';  // Import the ChangePassword component
 
 // Import React Icons
 import {
@@ -25,8 +25,6 @@ import {
 import Assessment from './Assessment';
 
 const DashboardPage = () => {
-  //const location = useLocation();
-  //const navigate = useNavigate(); //
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
   const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
@@ -38,14 +36,10 @@ const DashboardPage = () => {
   const [isCustomerMenuOpen, setIsCustomerMenuOpen] = useState(false);
   const [isLoanMenuOpen, setIsLoanMenuOpen] = useState(false);
   const [isCreditAssessmentMenuOpen, setIsCreditAssessmentMenuOpen] = useState(false);
-  const[isCreditComiteeMenu,setIsCreditComiteeMenu]=useState(false)
-  //const [activeSection, setActiveSection] = useState('');
-
-  //const location = useLocation();
-  //const username = location.state?.username || localStorage.getItem('username') || 'User';
-
+  const [isCreditComiteeMenu, setIsCreditComiteeMenu] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false); 
+
   const location = useLocation();
   const navigate = useNavigate(); // Use navigate for redirection
   const username = location.state?.username || localStorage.getItem('username') || 'User';
@@ -99,7 +93,7 @@ const DashboardPage = () => {
     setActiveSection('');
   };
 
-  const toggleCreditComiteeMenu=()=>{
+  const toggleCreditComiteeMenu = () => { 
     setIsCreditComiteeMenu(!isCreditComiteeMenu);
     setActiveSection('');
   };
@@ -113,6 +107,10 @@ const DashboardPage = () => {
     setIsProfileMenuOpen(!isProfileMenuOpen); // Toggle profile menu
   };
 
+  const handleChangePassword = () => {
+    // Set the active section to 'Change Password'
+    setActiveSection('Change Password');
+  };
 
   return (
     <div className="d-flex">
@@ -201,9 +199,7 @@ const DashboardPage = () => {
       {/* Main Content */}
       <div className="content-area">
         <div className="welcome-section bg-primary text-white p-3 d-flex justify-content-between align-items-center">
-          {/* Flex container with space between Login and Profile Icon */}
-          
-               <div className="profile-section" style={{ position: 'relative' }}>
+          <div className="profile-section" style={{ position: 'relative' }}>
             <div
               className="d-flex align-items-center"
               onClick={toggleProfileMenu} 
@@ -241,22 +237,22 @@ const DashboardPage = () => {
                   <li>
                     <button
                       className="btn btn-link text-dark w-100 text-start"
-                      onClick={() => alert('User Experience Coming Soon!')}
+                      onClick={handleChangePassword}
                     >
-                      upload picture
+                      Change Password
                     </button>
                   </li>
                 </ul>
               </div>
             )}
           </div>
-             
 
           <p>Yonkopa Micro-Credit Enterprise</p>
           <p>
             {currentTime} | {currentDate}
           </p>
         </div>
+
         {/* Conditionally Render Components Based on Active Section */}
         <div className="scrollable-content">
           {activeSection === 'Customer Registration' ? (
@@ -278,48 +274,23 @@ const DashboardPage = () => {
             <IndividualLoan />
           ) : activeSection === 'Assessment Files' ? (
             <Assessment />
-          
+          ) : activeSection === 'Change Password' ? (
+            <ChangePassword />
           ) : (
             <div className="centered-content d-flex justify-content-around text-center mt-5">
-  <div
-    className="metric-card d-flex flex-column align-items-center p-3"
-    style={{
-      backgroundColor: 'white',
-      borderRadius: '8px',
-      
-      width: '350px',
-    }}
-  >
-    <FaMoneyCheckAlt size={30} className="text-primary mb-1" />
-    <p className="mb-0" style={{ fontWeight: 'normal' }}>Loan Repayments</p>
-  </div>
-  <div
-    className="metric-card d-flex flex-column align-items-center p-3"
-    style={{
-      backgroundColor: 'white',
-      borderRadius: '1px',
-      
-    
-      width: '350px',
-    }}
-  >
-    <FaHandHoldingUsd size={30} className="text-success mb-1" />
-    <p className="mb-0" style={{ fontWeight: 'normal' }}>Cash On Hand</p>
-  </div>
-  <div
-    className="metric-card d-flex flex-column align-items-center p-3"
-    style={{
-      backgroundColor: 'white',
-      borderRadius: '1px',
-      
-      width: '350px',
-    }}
-  >
-    <FaWallet size={30} className="text-warning mb-2" />
-    <p className="mb-0" style={{ fontWeight: 'normal' }}>Loans Disbursed</p>
-  </div>
-</div>
-
+              <div className="metric-card d-flex flex-column align-items-center p-3">
+                <FaMoneyCheckAlt size={30} className="text-primary mb-1" />
+                <p className="mb-0" style={{ fontWeight: 'normal' }}>Loan Repayments</p>
+              </div>
+              <div className="metric-card d-flex flex-column align-items-center p-3">
+                <FaHandHoldingUsd size={30} className="text-success mb-1" />
+                <p className="mb-0" style={{ fontWeight: 'normal' }}>Cash On Hand</p>
+              </div>
+              <div className="metric-card d-flex flex-column align-items-center p-3">
+                <FaWallet size={30} className="text-warning mb-2" />
+                <p className="mb-0" style={{ fontWeight: 'normal' }}>Loans Disbursed</p>
+              </div>
+            </div>
           )}
         </div>
       </div>
@@ -327,4 +298,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;                          
+export default DashboardPage;

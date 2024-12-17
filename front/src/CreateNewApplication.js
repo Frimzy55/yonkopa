@@ -104,7 +104,7 @@ const CreateNewApplication = () => {
   });
 
 
-  const handleSelectCustomer = (customer) => {
+  /*const handleSelectCustomer = (customer) => {
     setSelectedCustomer(customer);
 
     
@@ -115,7 +115,33 @@ const CreateNewApplication = () => {
     formik.setFieldValue('dateOfBirth', formatDate(customer.date_of_birth));  // Add this line
     formik.setFieldValue('residentialLocation',customer.residential_location);
     formik.setFieldValue('residentialGpsAddress',customer.residential_gps_address);
+  };*/
+
+
+  const handleSelectCustomer = async (customer) => {
+    setSelectedCustomer(customer);
+
+    // Fetch loan cycle count from the backend based on customer ID
+    try {
+      const response = await axios.get(`http://localhost:5001/get-loan-cycle-count/${customer.customer_id}`);
+      const loanCycleCount = response.data.loanCycleCount || 1; // Default to 1 if no data is returned
+
+      // Set the customer values in the form
+      formik.setFieldValue('customerId', customer.customer_id);
+      formik.setFieldValue('firstName', customer.first_name);
+      formik.setFieldValue('lastName', customer.last_name);
+      formik.setFieldValue('telephoneNumber', customer.telephone_number);
+      formik.setFieldValue('dateOfBirth', formatDate(customer.date_of_birth));
+      formik.setFieldValue('residentialLocation', customer.residential_location);
+      formik.setFieldValue('residentialGpsAddress', customer.residential_gps_address);
+
+      // Automatically set loan cycle based on previous application count
+      formik.setFieldValue('loanCycle', loanCycleCount);
+    } catch (error) {
+      console.error('Error fetching loan cycle count:', error);
+    }
   };
+
 
 
   const formatDate = (date) => {

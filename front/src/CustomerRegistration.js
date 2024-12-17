@@ -24,7 +24,23 @@ const CustomerRegistration = () => {
     placeOfBirth: Yup.string().required("Place of birth is required"),
     maritalStatus: Yup.string().required("Marital Status is required"),
     formId: Yup.string().required("Form of ID is required"),
-    idNumber: Yup.string().required("Id number is required"),
+    //idNumber: Yup.string().required("Id number is required"),
+    formId: Yup.string().required("Form of ID is required"),
+    idNumber: Yup.string()
+    .required("Id number is required")
+    .test('unique-id', 'This ID number is already in use', async (value) => {
+      if (value) {
+        try {
+          // Send the ID number to your backend for validation
+          const response = await axios.post('http://localhost:5001/check-id-number', { idNumber: value });
+          return response.data.isUnique; // Assuming the backend returns { isUnique: true/false }
+        } catch (error) {
+          console.error('Error checking ID number:', error);
+          return false;
+        }
+      }
+      return true;
+    }),
     dateOfIssue: Yup.date().required("Date of issue is required"),
     idExpiryDate: Yup.date().required("Expiry date is required"),
     nationality: Yup.string().required("Nationality is required"),
@@ -512,9 +528,9 @@ const CustomerRegistration = () => {
             onChange={formik.handleChange}
           >
             <option value="">Relationship Officer</option>
-            <option value="one">Officer 1</option>
-            <option value="two">Officer 2</option>
-            <option value="three">Officer 3</option>
+            <option value="Officer 1">Officer 1</option>
+            <option value="Officer 2">Officer 2</option>
+            <option value="officer 3">Officer 3</option>
             
           </select>
           {formik.touched.relationshipOfficer && formik.errors.relationshipOfficer && (

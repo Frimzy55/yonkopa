@@ -64,6 +64,7 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
 
     const alertClass = status.type === 'success' ? 'alert-success' : 'alert-danger';
     return <div className={`alert ${alertClass} mt-3`}>{status.message}</div>;
+
   };
 
   return (
@@ -169,4 +170,4 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
   );
 };
 
-export default CustomerDetails;
+export default CustomerDetails;                         
