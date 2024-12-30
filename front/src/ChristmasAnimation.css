@@ -1,0 +1,40 @@
+.christmas-animation {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1000;
+    text-align: center;
+    animation: bounceFade 6s infinite;
+  }
+  
+  .christmas-message {
+    font-size: 1.2rem; /* Reduced size */
+    font-weight: bold;
+    color: #ff4500; /* Orange red */
+    text-shadow: 1px 1px #ffffff, 0 0 6px #32cd32; /* Subtle glow */
+  }
+  
+  .christmas-submessage {
+    font-size: 0.8rem; /* Smaller text */
+    color: #ffffff;
+    background: linear-gradient(45deg, #ff4500, #32cd32);
+    padding: 4px 8px; /* Smaller padding */
+    border-radius: 8px; /* Reduced rounding */
+    margin-top: 4px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Softer shadow */
+  }
+  
+  @keyframes bounceFade {
+    0%, 100% {
+      opacity: 0;
+      transform: translateY(-15px) scale(0.7); /* Reduced scale */
+    }
+    30% {
+      opacity: 1;
+      transform: translateY(0) scale(1.05); /* Slight bounce */
+    }
+    60% {
+      transform: translateY(-8px) scale(0.95);
+    }
+  }
+  

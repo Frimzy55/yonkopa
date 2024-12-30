@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import myImage from './image/image1.jpg';
 import logo from './image/yonko.png';
 import log from './image/microservices.png';
 import ff from './image/images.jpeg';
+import christmasTree from './image/cha.png'; // Christmas tree image
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import './App.css';
 
@@ -14,6 +15,18 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
   const [errors, setErrors] = useState({ username: '', password: '', form: '' });
+  const [showChristmasTree, setShowChristmasTree] = useState(false);
+
+  useEffect(() => {
+    const today = new Date();
+    const currentMonth = today.getMonth(); // 0 = January, 11 = December
+    const currentDate = today.getDate();
+
+    // Check if the date is between Dec 25 and Dec 31
+    if (currentMonth === 11 && currentDate >= 24 && currentDate <= 31) {
+      setShowChristmasTree(true);
+    }
+  }, []);
 
   const validateInputs = () => {
     let isValid = true;
@@ -93,6 +106,15 @@ const LoginPage = () => {
         <div className="w-100" style={{ maxWidth: '500px' }}>
           <div className="text-center mb-4">
             <img src={logo} alt="Logo" style={{ width: '150px' }} />
+            {showChristmasTree && (
+              <div className="mt-3">
+                <img
+                  src={christmasTree}
+                  alt="Christmas Tree"
+                  style={{ width: '40px', height: '60px', objectFit: 'cover' }}
+                />
+              </div>
+            )}
           </div>
 
           <form
@@ -111,7 +133,7 @@ const LoginPage = () => {
 
             <div className="mb-3">
               <label htmlFor="username" className="form-label">
-                
+                {/* Optional Label */}
               </label>
               <input
                 type="text"
@@ -129,7 +151,7 @@ const LoginPage = () => {
 
             <div className="mb-3 position-relative">
               <label htmlFor="password" className="form-label">
-                
+                {/* Optional Label */}
               </label>
               <div className="input-group">
                 <input
@@ -137,7 +159,7 @@ const LoginPage = () => {
                   id="password"
                   name="password"
                   className={`form-control ${errors.password && 'is-invalid'}`}
-                  placeholder=" Password"
+                  placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />

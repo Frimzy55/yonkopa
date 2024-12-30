@@ -1,14 +1,29 @@
 import React, { useState } from "react";
-import { Button, Box, Typography } from "@mui/material";
+import { Button, Box, Typography, Snackbar } from "@mui/material";
 
 const MaterialImageUploader = () => {
   const [preview, setPreview] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(""); // To store error message
+  const [openSnackbar, setOpenSnackbar] = useState(false); // To control snackbar visibility
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+    console.log(file); // Debugging: Check the selected file
+
     if (file) {
-      setPreview(URL.createObjectURL(file));
+      if (file.type.startsWith("image")) {
+        setPreview(URL.createObjectURL(file)); // Show the preview
+        setErrorMessage(""); // Clear any previous error
+        setOpenSnackbar(false); // Hide the snackbar if no error
+      } else {
+        setErrorMessage("Please select a valid image file."); // Set error message
+        setOpenSnackbar(true); // Show snackbar with error
+      }
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -17,6 +32,7 @@ const MaterialImageUploader = () => {
         Upload Photo
         <input type="file" hidden onChange={handleFileChange} />
       </Button>
+
       {preview && (
         <Box mt={2}>
           <Typography>Image Preview:</Typography>
@@ -27,6 +43,14 @@ const MaterialImageUploader = () => {
           />
         </Box>
       )}
+
+      {/* Snackbar for error message */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={errorMessage}
+      />
     </Box>
   );
 };

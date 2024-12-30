@@ -53,6 +53,7 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
   const [surplus, setSurplus] = useState(0);
   const [surplusValue, setSurplusValue] = useState(0);
   const [grossMargin, setGrossMargin] = useState(0);
+ const [surplusInterpretation, setSurplusInterpretation] = useState("")
 
 
 
@@ -172,6 +173,9 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
         otherIncomeInput,
         loanRe,
         householdSurplus,
+        surplus,
+        
+        surplusInterpretation
       };
   
       console.log('Payload:', payload); // Debugging: Ensure the payload is as expected
@@ -506,7 +510,9 @@ const CreditWorthDetail = ({ customer, onBack, onNext, hasNext }) => {
                  surplus={surplus}
                  setSurplus={setSurplus}
                  handleDisplayResult={handleDisplayResult}
-                 result={result}
+                 //result={result}
+                 surplusInterpretation={surplusInterpretation}
+                 setSurplusInterpretation={setSurplusInterpretation}
                 />
 
                   {submitStatus && (

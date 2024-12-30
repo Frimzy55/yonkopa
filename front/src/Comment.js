@@ -2,34 +2,50 @@ import React, { useState } from 'react';
 import { FaRegCommentDots } from 'react-icons/fa'; // Importing a comment icon
 import axios from 'axios';
 
-function Comment({ customer, onBack, onNext, hasNext }) {
+function Comment({ customer, onBack, onNext }) {
   const [comment, setComment] = useState('');
+  const [recommendedAmount, setRecommendedAmount] = useState(100); // Initial recommended amount
   const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleCommentChange = (e) => {
     setComment(e.target.value);
   };
 
-  // Function to handle comment submission
-  const handleSubmit = async (apiEndpoint) => {
+  const handleAmountChange = (e) => {
+    setRecommendedAmount(e.target.value); // Update recommended amount
+  };
+
+  // Function to handle submission to both APIs
+  const handleSubmit = async () => {
     if (comment.trim() === '') {
       alert('Please enter a comment before proceeding.');
       return;
     }
 
     try {
-      const response = await axios.post(apiEndpoint, {
-        customer_id: customer.customer_id, // Ensure `customer` is correctly defined and has `customer_id`
+      // Send data to the first API endpoint
+      const response1 = await axios.post('http://localhost:5001/api/submit', {
+        customer_id: customer.customer_id,
         comment,
       });
+      console.log('First API response:', response1.data);
 
-      console.log('Comment saved:', response.data);
-      setSubmitStatus({ success: true, message: 'Comment submitted successfully!' });
-      onNext(); // Proceed to the next step
+      // Send data to the second API endpoint
+      const response2 = await axios.post('http://localhost:5001/api/comments', {
+        customer_id: customer.customer_id,
+        comment,
+      });
+      console.log('Second API response:', response2.data);
+
+      // Set success status
+      setSubmitStatus({ success: true, message: 'Data submitted successfully to both APIs!' });
+
+      // Proceed to the next step
+      onNext();
     } catch (error) {
-      console.error('Error submitting comment:', error);
-      setSubmitStatus({ success: false, message: 'Failed to submit the comment. Please try again later.' });
-      alert('Failed to submit comment. Please try again.');
+      console.error('Error submitting data:', error);
+      setSubmitStatus({ success: false, message: 'Failed to submit the data. Please try again.' });
+      alert('Failed to submit data. Please try again.');
     }
   };
 
@@ -40,24 +56,31 @@ function Comment({ customer, onBack, onNext, hasNext }) {
   return (
     <div className="container my-4">
       <div className="card shadow">
-        <div className="card-header bg-white text-primary d-flex justify-content-between align-items-center">
-          <h5 className="mb-0">Customer ID: {customer.customer_id}</h5> {/* Display customer ID */}
+        <div className="card-header bg-white d-flex justify-content-between align-items-center">
+          <h5 className="mb-0 text-white">Customer ID: {customer.customer_id}</h5> {/* Display customer ID */}
           <h3 className="mb-0">
             <FaRegCommentDots className="me-2" /> General Comments
           </h3>
-          <div>
-            <button className="btn btn-secondary btn-sm me-2" onClick={onBack}>
-              Back
-            </button>
-            <button
-              className="btn btn-success btn-sm"
-              onClick={() => handleSubmit('http://localhost:5001/api/submit')}
-            >
-              Submit
-            </button>
-          </div>
+          <button className="btn btn-secondary btn-sm" onClick={onBack}>
+            Back
+          </button>
         </div>
         <div className="card-body">
+          {/* Recommended Amount Input Section */}
+          <div className="mb-3">
+            <label htmlFor="recommendedAmount" className="form-label">
+              Recommended Amount:
+            </label>
+            <input
+              id="recommendedAmount"
+              type="number"
+              className="form-control"
+              value={recommendedAmount}
+              onChange={handleAmountChange} // Handle the change of the recommended amount
+            />
+          </div>
+
+          {/* Comment Section */}
           <div className="mb-3">
             <label htmlFor="commentInput" className="form-label">
               Comment:
@@ -71,16 +94,18 @@ function Comment({ customer, onBack, onNext, hasNext }) {
               onChange={handleCommentChange}
             ></textarea>
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={() => handleSubmit('http://localhost:5001/api/comments')}
-            disabled={!comment.trim()}
-          >
-            Save and Proceed
-          </button>
+          <div className="d-flex justify-content-between">
+            <button
+              className="btn btn-success"
+              onClick={handleSubmit}
+              disabled={!comment.trim()}
+            >
+              Submit
+            </button>
+          </div>
 
           {submitStatus && (
-            <div className={`alert ${submitStatus.success ? 'alert-success' : 'alert-danger'}`}>
+            <div className={`alert ${submitStatus.success ? 'alert-success' : 'alert-danger'} mt-3`}>
               {submitStatus.message}
               <button
                 type="button"

@@ -86,7 +86,22 @@ app.post('/register', (req, res) => {
     refereeLastName,
     refereeHouseLocation,
     refereeContact,
-    relationshipOfficer
+    relationshipOfficer,
+
+     fathersName,
+      mothersName,
+      spouseOccupation,
+      fathersContact,
+      mothersContact,
+      religion,
+
+      spouseName,
+      churchName,
+      churchLocation,
+
+      spouseContact,
+      numberOfDependants,
+      numberOfDependantsSchooling
   } = req.body;
 
   // Validate the required fields
@@ -97,16 +112,22 @@ app.post('/register', (req, res) => {
   // Insert customer into the database (without customer_id)
   const insertQuery = `INSERT INTO customer (
     title, first_name, other_names, last_name, date_of_birth, place_of_birth, gender, marital_status,
-    form_of_id, id_number, date_of_issue, id_expiry_date, nationality, telephone_number, residential_location,
-    suburb, residential_gps_address, alternative_number, employment_status, referee_first_name, referee_last_name,
-    referee_house_location, referee_contact, relationship_officer
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    form_of_id, id_number, date_of_issue, id_expiry_date, home_town, telephone_number, residential_location,
+    street_name, residential_gps_address, residential_address, employment_status, referee_first_name, referee_last_name,
+    referee_house_location, referee_contact, relationship_officer ,fathersName, mothersName,spouseOccupation,fathersContact,
+     mothersContact, religion,spouseName,churhName,churchLocation,spouseContact, number_of_dependants, number_of_dependants_schooling
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?,?,?,?,?,?  ,?,?,? ,?,?,?)`;
 
   const values = [
     title, firstName, otherNames, lastName, dateOfBirth, placeOfBirth, gender, maritalStatus,
     formId, idNumber, dateOfIssue, idExpiryDate, nationality, telephoneNumber, residentialLocation,
     suburb, residentialGpsAddress, alternativeNumber, employmentStatus, refereeFirstName, refereeLastName,
-    refereeHouseLocation, refereeContact, relationshipOfficer
+    refereeHouseLocation, refereeContact, relationshipOfficer,fathersName, mothersName,spouseOccupation,fathersContact,
+     mothersContact, religion, spouseName, churchName,churchLocation,spouseContact,numberOfDependants,
+     numberOfDependantsSchooling
+    
+     
+    
   ];
 
   // Step 1: Insert the customer
@@ -175,7 +196,7 @@ app.get('/search-customers', (req, res) => {
 
   // SQL query to search by first_name, last_name, or customer_id
   const query = `
-    SELECT id, customer_id, first_name, last_name ,telephone_number,date_of_birth,relationship_officer,residential_location,residential_gps_address
+   SELECT *
     FROM customer
     WHERE first_name LIKE ? OR last_name LIKE ? OR customer_id LIKE ?  
   `;
@@ -230,7 +251,8 @@ app.post('/loan-application', (req, res) => {
     monthlyNetIncome,
     dateOfBirth,
     residentialLocation,
-    residentialGpsAddress
+    residentialGpsAddress,
+    guarantorContact
     
     
     
@@ -251,8 +273,8 @@ app.post('/loan-application', (req, res) => {
       guarantor_gender, guarantor_date_of_birth, relationship_with_client,
       residential_location, residential_gps_address, business_type, business_location,
       working_capital, years_of_operation, business_gps_address, employer_name,
-      years_in_service, monthly_net_income,date_of_birth,customer_location,customer_gps_address
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)
+      years_in_service, monthly_net_income,date_of_birth,customer_location,customer_gps_address,guarantor_contact 
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)
   `;
 
   // Handle missing or optional fields like guarantorPhoto and payslip
@@ -288,6 +310,7 @@ app.post('/loan-application', (req, res) => {
     dateOfBirth,
     residentialLocation,
     residentialGpsAddress,
+    guarantorContact
     
     
     
@@ -327,7 +350,8 @@ app.get('/loan-application', (req, res) => {
       guarantor_date_of_birth,
       relationship_with_client,
       residential_location,
-      residential_gps_address
+      residential_gps_address,
+      guarantor_contact
       
       
       
@@ -410,7 +434,8 @@ app.post('/customer', (req, res) => {
     guarantor_date_of_birth,
     relationship_with_client,
     residential_location,
-    residential_gps_address
+    residential_gps_address,
+    guarantor_contact
   } = req.body;
 
   // Format the date to MySQL-compatible format
@@ -420,15 +445,15 @@ app.post('/customer', (req, res) => {
     INSERT INTO customer_details 
     (customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, region, 
     amount_requested,customer_location,customer_gps_address,guarantor_name,guarantor_nationality,
-    guarantor_gender,guarantor_date_of_birth,relationship_with_client,residential_location,residential_gps_address)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)
+    guarantor_gender,guarantor_date_of_birth,relationship_with_client,residential_location,residential_gps_address,guarantor_contact)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?)
   `;
 
   db.query(
     query,
     [customer_id, applicant_name, telephone_number, credit_officer, date_of_birth, branch, 
       region, amount_requested,customer_location,customer_gps_address,guarantor_name,
-      guarantor_nationality,guarantor_gender,guarantor_date_of_birth,relationship_with_client,residential_location,residential_gps_address],
+      guarantor_nationality,guarantor_gender,guarantor_date_of_birth,relationship_with_client,residential_location,residential_gps_address,guarantor_contact],
     (err, result) => {
       if (err) {
         console.error('Error inserting customer details:', err);
@@ -438,6 +463,19 @@ app.post('/customer', (req, res) => {
     }
   );
 });
+
+
+
+
+ // db.query(query, (err, result) => {
+   // if (err) {
+    //  console.error('Error deleting expired customer details:', err);
+    //} else {
+    //  console.log(`Deleted ${result.affectedRows} expired customer records.`);
+    //}
+  //});
+
+
 
 
 
@@ -461,7 +499,7 @@ app.post('/api/land', (req, res) => {
 
   const query = `
     INSERT INTO land_details 
-    (customer_id,location, land_title, market_value, ltv_ratio, nearest_landmark, digital_address, forced_sale_value, ltv_ratio_plus_10)
+    (customer_id,location, land_title, market_value, Itv_ratio, nearest_landmark, digital_address, forced_sale_value, Itv_ratio_plus_10)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
   `;
 
@@ -481,10 +519,12 @@ app.post('/api/land', (req, res) => {
 
 
 
+
+
 app.post('/api/vehicle', (req, res) => {
   const { customer_id, vbrand, vchasiss, vmodelyeaar, vmarket, vltvRatio, vmodel, vregister, vmileage, vforcedSaleValue, vltvRatioPlus10 } = req.body;
 
-  const query = `INSERT INTO vehicle_details (customer_id, brand, chassis_number, model_year, market_value, ltv_ratio, model, registration_number, mileage, forced_sale_value, ltv_ratio_plus_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = `INSERT INTO vehicle_details (customer_id, brand, chassis_number, model_year, market_value, Itv_ratio, model, registration_number, mileage, forced_sale_value, Itv_ratio_plus_10) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const values = [customer_id, vbrand, vchasiss, vmodelyeaar, vmarket, vltvRatio, vmodel, vregister, vmileage, vforcedSaleValue, vltvRatioPlus10];
 
@@ -496,6 +536,8 @@ app.post('/api/vehicle', (req, res) => {
     res.status(200).send('Vehicle details added successfully');
   });
 });
+
+
 
 app.post('/api/build', (req, res) => {
   const { customer_id, blocation, blandTitle, bmarketValue, bltvRatio, bnearestLandmark, bdigitalAddress, bforcedSaleValue, bltvRatioPlus10 } = req.body;
@@ -513,6 +555,8 @@ app.post('/api/build', (req, res) => {
   });
 });
 
+
+
 app.post('/api/cash', (req, res) => {
   const { customer_id, cash_amount } = req.body;
 
@@ -528,6 +572,7 @@ app.post('/api/cash', (req, res) => {
     res.status(200).send('Cash data added successfully');
   });
 });
+
 
 
 
@@ -560,6 +605,9 @@ app.post("/api/credit", (req, res) => {
     otherIncomeInput,
     loanRe,
     householdSurplus,
+    surplus,
+        
+    surplusInterpretation
   } = req.body;
 
   const sql = `
@@ -568,9 +616,9 @@ app.post("/api/credit", (req, res) => {
       businessDescription, canPayLoan, currentStockValue, startedBusinessWith, sourceOfFund,
       principal, rate, loanTerm, loanAmount, interest, monthlyInstallment, monthlySalesRevenue,
       grossMarginInput, grossProfit, costOfGoodsSold, totalOperatingExpenses, netBusinessProfit,
-      householdExpensesInput, otherIncomeInput, loanRe, householdSurplus
+      householdExpensesInput, otherIncomeInput, loanRe, householdSurplus,capacity_to_pay_analysis,results
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
   `;
 
   const values = [
@@ -578,7 +626,9 @@ app.post("/api/credit", (req, res) => {
     businessDescription, canPayLoan, currentStockValue, startedBusinessWith, sourceOfFund,
     principal, rate, loanTerm, loanAmount, interest, monthlyInstallment, monthlySalesRevenue,
     grossMarginInput, grossProfit, costOfGoodsSold, totalOperatingExpenses, netBusinessProfit,
-    householdExpensesInput, otherIncomeInput, loanRe, householdSurplus,
+    householdExpensesInput, otherIncomeInput, loanRe, householdSurplus, surplus, surplusInterpretation
+        
+    
   ];
 
   db.query(sql, values, (err, result) => {
@@ -590,6 +640,7 @@ app.post("/api/credit", (req, res) => {
     }
   });
 });
+
 
 
 app.post('/api/comments', (req, res) => {
@@ -611,6 +662,7 @@ app.post('/api/comments', (req, res) => {
 
 
 
+
 app.post('/api/submit', (req, res) => {
   // Step 1: SQL to create the temporary table
   const createTempTableQuery = `
@@ -626,7 +678,11 @@ SELECT
   c.customer_gps_address,
   c.guarantor_name,
   c.residential_location,
+  c.relationship_with_client,
   c.residential_gps_address,
+  c.guarantor_date_of_birth,
+  c.guarantor_contact,
+  c.created_at,
   a.cash_amount,  
   b.businessType,
   b.businessLocation,
@@ -661,12 +717,13 @@ SELECT
   b.loanTerm,
   b.loanAmount,
   b.interest,
+  b.capacity_to_pay_analysis,
+  b.results,
   bu.location,  -- Added build_details columns
   bu.land_title,
   bu.market_value,
   bu.Itv_ratio,
   bu.Itv_ratio_plus_10,
-  
   bu.nearest_landmark,
   bu.digital_address,
   bu.forced_sale_value,
@@ -677,7 +734,17 @@ SELECT
   V.model,
   v.registration_number,
   v.mileage,
-  v.forced_sale_value
+  v.forced_sale_value,
+  v.Itv_ratio,
+  v.Itv_ratio_plus_10,
+  l.location,
+  l.land_title,
+  l.market_value,
+  l.Itv_ratio,
+  l.Itv_ratio_plus_10,
+  l.nearest_landmark,
+  l.digital_address,
+  l.forced_sale_value
   
 FROM 
   customer_details c
@@ -686,7 +753,9 @@ FROM
   INNER JOIN comments co ON c.customer_id = co.customer_id
   LEFT JOIN build_details bu ON c.customer_id = bu.customer_id-- Added LEFT JOIN for build_details
   LEFT JOIN vehicle_details v ON c.customer_id = v.customer_id
-  LEFT JOIN cash_details a ON c.customer_id = a.customer_id;
+  LEFT JOIN cash_details a ON c.customer_id = a.customer_id
+  LEFT JOIN land_details l ON c.customer_id = l.customer_id
+  
   `;
 
 
@@ -702,6 +771,10 @@ FROM
        c.guarantor_name AS guarantorName,
        c.residential_location AS guarantorResidential,
        c.residential_gps_address AS guarantorGpsAddress,
+       c.guarantor_date_of_birth AS guarantorDateOfBirth,
+       c.guarantor_contact AS guarantorContact,
+      c.relationship_with_client AS relationship,
+      c.created_at AS applicantDate,
       b.principal AS principal,
        b.businessType AS businessType,
        b.businessLocation AS businessLocation,
@@ -725,24 +798,47 @@ FROM
          b.netBusinessProfit AS netBusinessProfit,
          b.householdExpensesInput AS householdExpenseInput,
          b.otherIncomeInput AS otherIncomeInput,
-         b.loanRe AS loanReccomendation ,
+         b.loanRe AS loanRecommendation ,
          co.comment AS comment,
-         bu.location AS location,
-         bu.land_title AS landTitle,
-         bu.market_value AS marketValue,
-         bu.Itv_ratio AS Itv_ratio,
-         bu.Itv_ratio_plus_10 AS Itv_ratio_plus_10,
-         bu.nearest_landmark AS nearest_landmark,
-        bu.digital_address AS digitalAddress,
+         bu.location AS Buildinglocation,
+         bu.land_title AS BuildinglandTitle,
+         bu.market_value AS BuildingMarketValue,
+         bu.Itv_ratio AS BuildingItv_ratio,
+         bu.Itv_ratio_plus_10 AS BuildingItv_ratio_plus_10,
+         bu.nearest_landmark AS BuildingNearest_landmark,
+        bu.digital_address AS BuldingdigitalAddress,
         bu.forced_sale_value AS forceSale,
-         a.cash_amount AS cashAmount
+         b.capacity_to_pay_analysis AS SurplusOrDeficit,
+         b.results AS results,
+         a.cash_amount AS cashAmount,
+          v.brand AS VehicleBrand,
+          v.chassis_number AS Vehicle_Chassis_number,
+          v.model_year AS Vehicle_model_year,
+          v.market_value AS Vehicle_market_value,
+          v.model AS VehicleModel,
+          v.registration_number AS Vehicle_registration_number,
+          v.mileage AS Vehiclemileage,
+          v.forced_sale_value AS Vehicle_forced_sale_value,
+          v.Itv_ratio AS Vehicle_ltv_ratio,
+          v.Itv_ratio_plus_10 AS Vehicle_ltv_ratio_plus_10,
+          l.location AS Landlocation,
+          l.land_title AS title,
+          l.market_value AS LandmarketValue,
+          l.Itv_ratio AS LandItv_ratio,
+          l.Itv_ratio_plus_10 AS LandItv_ratio_plus_10,
+          l.nearest_landmark AS Landnearest_landmark,
+          l.digital_address AS Landdigital_address,
+          l.forced_sale_value AS Landforced_sale_value
+         
     FROM 
       customer_details c
       LEFT JOIN cash_details a ON c.customer_id = a.customer_id
       INNER JOIN business_loans b ON c.customer_id = b.customer_id
       INNER JOIN comments co ON c.customer_id = co.customer_id
       LEFT JOIN vehicle_details v ON c.customer_id = v.customer_id
-      LEFT JOIN build_details bu ON c.customer_id = bu.customer_id; 
+      LEFT JOIN build_details bu ON c.customer_id = bu.customer_id 
+       LEFT JOIN land_details l ON c.customer_id = l.customer_id
+      
   `;
 
   // Execute the first query to create the temporary table
@@ -799,7 +895,7 @@ app.get('/get-loan-cycle-count/:customerId', (req, res) => {
       return res.status(500).send({ message: 'Error retrieving loan cycle count' });
     }
 
-    let loanCycleCount = result[0].loanCycleCount || 1; // Default to 1 if no cycles found
+    let loanCycleCount = result[0].loanCycleCount || 0; // Default to 1 if no cycles found
 
     // Increase the loan cycle count by 1
     loanCycleCount++;
@@ -807,6 +903,418 @@ app.get('/get-loan-cycle-count/:customerId', (req, res) => {
     res.send({ loanCycleCount });
   });
 });
+
+
+
+app.get('/total-registrants', (req, res) => {
+  // Query to get the total number of registrants
+  db.query('SELECT COUNT(*) AS totalCount FROM customer', (err, results) => {
+    if (err) {
+      console.error('Error fetching total registrants:', err);
+      return res.status(500).send('Error fetching total registrants');
+    }
+    
+    // Return the total registrants count as JSON
+    res.json({ totalCount: results[0].totalCount });
+  });
+});
+
+
+
+
+app.post('/save-custom', (req, res) => {
+  const {
+    customerId,
+   
+    fullName,
+    telephoneNumber,
+    dateOfBirth,
+    residentialAddress,
+    gpsAddress,
+    chairComment,
+    chairApproval,
+    guarantorName,
+    guarantorDateOfBirth,
+    guarantorContact,
+    relationship,
+    guarantorResidential,
+    guarantorGpsAddress,
+    principal,
+    rate,
+    loanTerm,
+    loanAmount,
+    interest,
+    monthlyInstallment,
+    grossMarginInput,
+    monthlySalesRevenue,
+    costOfGoodsSold,
+    grossProfit,
+    totalOperatingExpenses,
+    netBusinessProfit,
+    householdExpenseInput,
+    otherIncomeInput,
+    householdSurplus,
+    loanRecommendation,
+    SurplusOrDeficit,
+    results,
+    Buildinglocation,
+    BuildingItv_ratio,
+    BuildingItv_ratio_plus_10,
+    BuildinglandTitle,
+    BuildingMarketValue,
+    BuildingNearest_landmark,
+
+    BuldingdigitalAddress,
+    forceSale,
+    cashAmount,
+    applicantDate,
+    VehicleBrand,
+    Vehicle_Chassis_number,
+    Vehicle_model_year,
+    Vehicle_market_value,
+    VehicleModel,
+
+    Vehicle_registration_number,
+    Vehiclemileage,
+    Vehicle_forced_sale_value,
+    Vehicle_ltv_ratio,
+    Vehicle_ltv_ratio_plus_10,
+
+    Landlocation,
+    title,
+    LandmarketValue,
+    LandItv_ratio,
+    LandItv_ratio_plus_10,
+    Landnearest_landmark,
+    Landdigital_address,
+    Landforced_sale_value
+
+
+  
+
+  } = req.body;
+
+  const query = `
+    INSERT INTO approval1
+    (customer_id, full_name, telephone_number, date_of_birth, residential_address,
+    gps_address, chair_comment, chair_approval ,gurantor_name,guarantor_date_of_birth, 
+    guarantor_contact,relationship_with_client,guarantor_residential,guarantor_gps_address,principal,rate,loanTerm,
+    loanAmount,interest,monthly_installment,gross_margin, monthly_sales_revenue,cost_of_goods_sold ,gross_profit,
+     total_operating_expenses ,net_business_profit,  household_expenses,other_income,household_surplus , loan_recommendation,
+     capacity_to_pay_analysis,results,building_location,building_itv_ratio,building_itv_ratio_10,building_land_title,
+      building_market_value,building_nearest_landmark,building_digital_address,building_force_salevalue,cash_amount,applicant_date,
+      vehicle_brand, vehicle_chassis_number, vehicle_model_year, vehicle_market_value,vehicle_model, vehicle_registration_number,
+      vehicle_mileage,vehicle_force_sale_value, vehicle_Itv_ratio,vehicle_Itv_ratio_plus_10 ,
+      land_location,land_title, land_market_value, land_nearest_landmark, land_digital_address ,land_sale_value, land_Itv_ratio,
+      land_Itv_ratio_plus_10 ) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? ,?,?,?,?,?,?,? ,?,?,?,?,?,?,?,?,?  ,?,?,?,?,?  ,?,?,?,?,?,  ?,?,?,?,?,?,?,?)
+  `;
+
+  db.query(query, [
+    customerId,
+    fullName,
+    telephoneNumber,
+    dateOfBirth,
+    residentialAddress,
+    gpsAddress,
+    
+    chairComment,
+    chairApproval,
+    guarantorName,
+    guarantorDateOfBirth,
+    guarantorContact,
+    relationship,
+    guarantorResidential,
+    guarantorGpsAddress,
+    principal,
+    rate,
+    loanTerm,
+    loanAmount,
+    interest,
+    monthlyInstallment,
+    grossMarginInput,
+    monthlySalesRevenue,
+    costOfGoodsSold,
+    grossProfit,
+    totalOperatingExpenses,
+    netBusinessProfit,
+    householdExpenseInput,
+    otherIncomeInput,
+    householdSurplus,
+    loanRecommendation,
+    SurplusOrDeficit,
+    results,
+    Buildinglocation,
+    BuildingItv_ratio,
+    BuildingItv_ratio_plus_10,
+    BuildinglandTitle,
+    BuildingMarketValue,
+    BuildingNearest_landmark,
+     BuldingdigitalAddress,
+     forceSale,
+     cashAmount,
+     applicantDate,
+     VehicleBrand,
+    Vehicle_Chassis_number,
+    Vehicle_model_year,
+    Vehicle_market_value,
+    VehicleModel,
+
+    Vehicle_registration_number,
+    Vehiclemileage,
+    Vehicle_forced_sale_value,
+    Vehicle_ltv_ratio,
+    Vehicle_ltv_ratio_plus_10,
+
+
+    Landlocation,
+    title,
+    LandmarketValue,
+    LandItv_ratio,
+    LandItv_ratio_plus_10,
+    Landnearest_landmark,
+    Landdigital_address,
+    Landforced_sale_value
+     
+
+
+  ], (error, results) => {
+    if (error) {
+      console.error('Error saving data:', error);
+      res.status(500).json({ message: 'Failed to save data' });
+    } else {
+      res.status(200).json({ message: 'Data saved successfully!' });
+    }
+  });
+});
+
+
+
+
+
+app.get('/save-custom', (req, res) => {
+  const query = `
+    SELECT *
+     
+      
+    FROM approval1
+  `;
+
+  // Perform the query
+  db.query(query, (err, result) => {
+    if (err) {
+      console.error('Database query failed:', err);
+      return res.status(500).send('Error fetching loan applications');
+    }
+    res.json(result); // Send the result back as a JSON response
+  });
+});
+
+
+const promiseConnection = db.promise();
+
+
+app.delete('/customers/:id', (req, res) => {
+  const customerId = req.params.id;
+
+  // Use the promise-based query
+  promiseConnection.query('DELETE FROM approval1 WHERE customer_id = ?', [customerId])
+    .then(result => {
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+      res.status(200).json({ message: 'Customer deleted successfully' });
+    })
+    .catch(error => {
+      console.error('Error deleting customer:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    });
+});
+
+
+
+
+app.get("/api/customer1/:id", (req, res) => {
+  const customerId = req.params.id;
+
+  // SQL query to fetch customer data based on customer_id
+  const query = "SELECT * FROM customer_approvaltwo WHERE customer_id = ?";
+
+  db.query(query, [customerId], (err, results) => {
+    if (err) {
+      console.error("Error fetching customer data: ", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Customer not found" });
+    }
+
+    res.json(results[0]); // Return the first matching customer record
+  });
+});
+
+
+
+
+app.delete('/delete-customer-data/:customerId', async (req, res) => {
+  const customerId = req.params.customerId;
+
+  const queries = [
+    'DELETE FROM customer_details WHERE customer_id = ?',
+    'DELETE FROM business_loans WHERE customer_id = ?',
+    'DELETE FROM cash_details WHERE customer_id = ?',
+    'DELETE FROM build_details WHERE customer_id = ?',
+    'DELETE FROM vehicle_details WHERE customer_id = ?',
+    'DELETE FROM land_details WHERE customer_id = ?',
+    'DELETE FROM comments WHERE customer_id = ?',
+  ];
+
+  try {
+    // Start a transaction
+    await db.promise().beginTransaction();
+
+    // Execute all delete queries concurrently using Promise.all
+    const deletePromises = queries.map(query => db.promise().query(query, [customerId]));
+
+    // Wait for all delete operations to finish
+    await Promise.all(deletePromises);
+
+    // Commit the transaction
+    await db.promise().commit();
+
+    // Send response to the client
+    res.status(200).send('Rows deleted successfully');
+  } catch (error) {
+    // Rollback in case of an error
+    await db.promise().rollback();
+    console.error('Error deleting rows:', error);
+    res.status(500).send('Failed to delete rows');
+  }
+  // Do NOT close the connection here (no db.end())
+});
+
+
+
+app.post('/loans-application', (req, res) => {
+  const formData = req.body;
+
+  // Ensure no undefined values are passed, replace undefined with null
+  const sanitize = (value) => (value === undefined ? null : value);
+
+  const query = `
+      INSERT INTO loan
+      (customer_id, first_name, last_name, date_of_birth, telephone_number, form_of_id, id_number, date_of_issue,
+       id_expiry_date, street_name, residential_gps_address, 
+      residential_location, residential_address, home_town, name_of_church, church_location, name_of_spouse, 
+      spouse_contact, number_of_dependants, number_of_dependants_schooling,
+       religion, name_of_father, father_phone_number, name_of_mother, mother_phone_number,
+       BusinessName,BusinessSector,BusinessLandmark,BusinessLocation,TypeOfBusiness,Businessgps,BusinessCapital,BusinessStockValue,cash,
+       AccountReceivables,AccountPayables,MaxSalesPerDay,MinSalesPerDay,NumberOfEmployees,ThirdPartyName,ThirdPartyContact,
+       loan_amount, loan_purpose, loan_term, monthly_installment,
+      repayment_frequency, repayment_amount, repayment_period,
+      previous_loan_request, previous_loan_approved, expected_due_date,
+      actual_due_date, ref_fullname1, ref_relationship1, ref_location1, ref_telephone1,
+      gfullname,grelationshipClient,gdateOfBirth,ghometown,ggender,gmaritalStatus,
+      gnumberOfDependants,
+    gtelephoneNumber,
+    gidType,
+    gidNumber,
+    gplaceOfWorship,
+    gresidentialLocation,
+    gresidentialStatus,
+    ggpsAddress,
+    gmajorLandmark,
+    gbusinessStructure,
+    gbusinessCapital,
+    gbusinessStockValue,
+    gguarantorBusinessLocation,
+    gguarantorBusinessGps,
+    credit_officer
+      
+
+
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,  ?,  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?  ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?  ,?,?,? ,?,?,?   ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+   `;
+
+  const values = [
+      sanitize(formData.customerId), sanitize(formData.firstName), sanitize(formData.lastName), sanitize(formData.dateOfBirth),
+      sanitize(formData.telephoneNumber), sanitize(formData.typeOfId), sanitize(formData.idNumber), sanitize(formData.dateOfIssue),
+      sanitize(formData.expiryDate), sanitize(formData.streetName), sanitize(formData.residentialGps), sanitize(formData.residentialLocation),
+      sanitize(formData.residentialAddress), sanitize(formData.homeTown), sanitize(formData.nameOfChurch), sanitize(formData.ChurchLocation),
+      sanitize(formData.nameOfSpouse), sanitize(formData.spouseContact), sanitize(formData.number_of_dependants), sanitize(formData.number_of_dependants_schooling),
+      sanitize(formData.religion), sanitize(formData.fathersName), sanitize(formData.fathersContact), sanitize(formData.mothersName), sanitize(formData.mothersContact),
+      sanitize(formData.businessName), 
+      sanitize(formData.businessSector), 
+      sanitize(formData.businessLandmark), 
+      sanitize(formData.businessLocation),
+      sanitize(formData.typeOfBusiness), 
+      sanitize(formData.businessGps), 
+      sanitize(formData.businessCapital), 
+      sanitize(formData.businessStock), 
+      sanitize(formData.cash), 
+      sanitize(formData.account), 
+      sanitize(formData.payable), 
+      sanitize(formData.max), 
+      sanitize(formData.min),
+      sanitize(formData.emp), 
+      sanitize(formData.thirdParty),
+      sanitize(formData.thirdPartyContact),
+    sanitize(formData.loanAmount),
+      sanitize(formData.loanPurpose),
+      sanitize(formData.loanTerm),
+      sanitize(formData.monthlyInstallment),
+      sanitize(formData.frequency),
+      sanitize(formData.repaymentAmount),
+      sanitize(formData.period),
+      sanitize(formData.request),
+      sanitize(formData.approved),
+      sanitize(formData.date),
+      sanitize(formData.actual),
+      sanitize(formData.refFullname1),
+      sanitize(formData.refRelation1),
+      sanitize(formData.refLocation1),
+      sanitize(formData.refTelephone1),
+      sanitize(formData.gfullname),
+      sanitize(formData.grelationshipClient),
+         sanitize(formData.gdateOfBirth),
+        sanitize(formData.ghometown),
+       sanitize(formData.ggender),
+       sanitize(formData.gmaritalStatus),
+        sanitize(formData.gnumberOfDependants),
+        sanitize(formData.gtelephoneNumber),
+        sanitize(formData.gidType),
+        sanitize(formData.gidNumber),
+       sanitize(formData.gplaceOfWorship),
+        sanitize(formData.gresidentialLocation),
+         sanitize(formData.gresidentialStatus),
+         sanitize(formData.ggpsAddress),
+         sanitize(formData.gmajorLandmark),
+         sanitize(formData.gbusinessStructure),
+        sanitize(formData.gbusinessCapital),
+         sanitize(formData.gbusinessStockValue),
+         sanitize(formData.gguarantorBusinessLocation),
+         sanitize(formData.gguarantorBusinessGps),
+         sanitize(formData.officer),
+
+
+      
+
+      
+  ];
+
+  // Use promise-based connection
+  db.promise().execute(query, values)
+      .then(() => {
+          res.status(200).json({ message: 'Form data saved successfully!' });
+      })
+      .catch((error) => {
+          res.status(500).json({ error: 'Database error: ' + error.message });
+      });
+});
+
+
 
 
 

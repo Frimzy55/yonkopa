@@ -23,6 +23,7 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
       // Reformat the date_of_birth to 'YYYY-MM-DD'
       const formattedDate = moment(customer.date_of_birth).format('YYYY-MM-DD');
       const formattedDate1 = moment(customer.guarantor_date_of_birth).format('YYYY-MM-DD');
+      const formattedDate2 = moment(customer.created_at).format('YYYY-MM-DD');
 
       const response = await axios.post('http://localhost:5001/customer', {
         customer_id: customer.customer_id,
@@ -41,7 +42,11 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
         relationship_with_client:customer.relationship_with_client,
         residential_location:customer.residential_location,
         residential_gps_address:customer.residential_gps_address,
-        guarantor_nationality:customer.guarantor_nationality
+        guarantor_nationality:customer.guarantor_nationality,
+        guarantor_contact:customer.guarantor_contact,
+        created_at:formattedDate2
+
+
         
 
 
@@ -137,18 +142,23 @@ const CustomerDetails = ({ customer, onNext, onBack, hasNext, hasPrevious }) => 
                 <div className="col-sm-6 text-white">{customer.customer_location}</div>
               </div>
               <div className="row mb-2">
+                <div className="col-sm-6 font-weight-bold text-white">application date:</div>
+                <div className="col-sm-6 text-white">{formatDate(customer.created_at)}</div>
+              </div>
+              <div className="row mb-2">
                 <div className="col-sm-6 font-weight-bold text-white">Residential GPS Address:</div>
                 <div className="col-sm-6 text-white">{customer.customer_gps_address}</div>
               </div>
             </div>
             <div className="row mb-2">
-                <div className="col-sm-6 text-primary">{customer.guarantor_name}</div>
-                <div className="col-sm-6 text-primary">{customer.relationship_with_client}</div>
-                <div className="col-sm-6 text-primary">{customer.guarantor_gender}</div>
-                <div className="col-sm-6 text-primary">{customer.residential_location}</div>
-                <div className="col-sm-6 text-primary">{customer.residential_gps_address}</div>
-                <div className="col-sm-6 text-primary">{customer.guarantor_nationality}</div>
-                <div className="col-sm-6 text-primary">{formatDate(customer.guarantor_date_of_birth)}</div>
+                <div className="col-sm-6 text-white">{customer.guarantor_name}</div>
+                <div className="col-sm-6 text-white">{customer.relationship_with_client}</div>
+                <div className="col-sm-6 text-white">{customer.guarantor_gender}</div>
+                <div className="col-sm-6 text-white">{customer.residential_location}</div>
+                <div className="col-sm-6 text-white">{customer.residential_gps_address}</div>
+                <div className="col-sm-6 text-white">{customer.guarantor_nationality}</div>
+                <div className="col-sm-6 text-white">{formatDate(customer.guarantor_date_of_birth)}</div>
+                <div className="col-sm-6 text-white">{customer.guarantor_contact}</div>
               </div>
           </div>
           {/* Render Status Message */}

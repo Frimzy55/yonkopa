@@ -1,6 +1,37 @@
 import React, { useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { TextField, Button, CircularProgress, Card, CardContent, Typography, Grid, Alert } from '@mui/material';
+import { styled } from '@mui/system';
+
+const Root = styled('div')({
+  padding: '2rem',
+});
+
+const SearchBox = styled('form')({
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+  maxWidth: '600px',
+  margin: '0 auto',
+});
+
+const SearchButton = styled(Button)({
+  marginLeft: '1rem',
+});
+
+const CardStyled = styled(Card)({
+  marginBottom: '1rem',
+  boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+});
+
+const ResultsContainer = styled('div')({
+  marginTop: '2rem',
+});
+
+const NoResults = styled(Typography)({
+  textAlign: 'center',
+  color: 'grey',
+});
 
 const CustomerSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -37,70 +68,71 @@ const CustomerSearch = () => {
   };
 
   return (
-    <div className="container my-5">
+    <Root>
       {/* Search Header */}
       <div className="text-center mb-4">
-        <h3 className="fw-bold">Customer Search</h3>
-        <p className="text-muted">Find customers by name or ID</p>
+        <Typography variant="h4" gutterBottom>
+          Customer Search
+        </Typography>
+        <Typography variant="body1" color="textSecondary">
+          Find customers by name or ID
+        </Typography>
       </div>
 
       {/* Search Form */}
-      <form onSubmit={handleSearch} className="d-flex justify-content-center mb-5">
-        <div className="input-group shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
-          <input
-            type="text"
-            className="form-control form-control-lg"
-            placeholder="Search by name or ID..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            required
-          />
-          <button
-            type="submit"
-            className="btn btn-primary btn-lg"
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="spinner-border spinner-border-sm text-light" role="status" />
-            ) : (
-              <FaSearch />
-            )}
-          </button>
-        </div>
-      </form>
+      <SearchBox onSubmit={handleSearch}>
+        <TextField
+          label="Search by name or ID"
+          variant="outlined"
+          fullWidth
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          required
+        />
+        <SearchButton
+          variant="contained"
+          color="primary"
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : <FaSearch />}
+        </SearchButton>
+      </SearchBox>
 
       {/* Search Results */}
-      <div className="search-results">
+      <ResultsContainer>
         {/* Error Message */}
-        {error && <div className="alert alert-danger text-center">{error}</div>}
+        {error && <Alert severity="error">{error}</Alert>}
 
         {/* Results */}
         {searchResults.length > 0 ? (
-          <div className="row">
-            {searchResults.map((customer, index) => (
-              <div key={customer.id} className="col-md-4 mb-4">
-                <div className="card shadow-sm">
-                  <div className="card-body">
-                    <h5 className="card-title text-primary">Customer ID: {customer.customer_id}</h5>
-                    <p className="card-text">
+          <Grid container spacing={3}>
+            {searchResults.map((customer) => (
+              <Grid item xs={12} sm={6} md={4} key={customer.id}>
+                <CardStyled>
+                  <CardContent>
+                    <Typography variant="h6" color="primary">
+                      Customer ID: {customer.customer_id}
+                    </Typography>
+                    <Typography variant="body1">
                       <strong>First Name:</strong> {customer.first_name || 'Not available'} <br />
                       <strong>Last Name:</strong> {customer.last_name || 'Not available'} <br />
                       <strong>Contact:</strong> {customer.telephone_number || 'Not available'}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                    </Typography>
+                  </CardContent>
+                </CardStyled>
+              </Grid>
             ))}
-          </div>
+          </Grid>
         ) : (
           !error && (
-            <p className="text-center text-muted">
+            <NoResults variant="body1" color="textSecondary">
               No customers found. Try a different search query.
-            </p>
+            </NoResults>
           )
         )}
-      </div>
-    </div>
+      </ResultsContainer>
+    </Root>
   );
 };
 

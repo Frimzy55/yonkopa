@@ -40,3 +40,41 @@
 .table-row-hover:hover {
   background-color: #d1ecf1 !important; /* Light Blue */
 }
+
+
+
+
+
+
+
+.nav-pills .nav-link {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-pills .nav-link:hover {
+  background-color:  #5c0446;
+  color: white !important;
+}
+
+.table-row-hover:hover {
+  background-color: #f8f9fa;
+  cursor: pointer;
+}
+
+.card {
+  border: none;
+  overflow: hidden;
+}
+
+.card-header {
+  border-bottom: 3px solid #5c0446;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+

@@ -40,12 +40,10 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
   const handleSelectCustomer = (customer) => {
     try {
       onSelectCustomer(customer);
-      //alert('Customer selected successfully');
       setSubmitStatus({ success: true, message: 'Customer selected successfully!' });
     } catch (err) {
       console.error('Error selecting customer:', err);
       setSubmitStatus({ success: false, message: 'Error submitting form. Please try again.' });
-      //alert('There was an error processing your selection');
     }
   };
 
@@ -67,7 +65,6 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
           <h4 className="mb-0 text-center">Customer Search</h4>
         </div>
         <div className="card-body p-4">
-          {/* Search Form */}
           <form onSubmit={handleSearch} className="mb-4">
             <div className="input-group">
               <input
@@ -84,18 +81,13 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
             </div>
           </form>
 
-          {/* Error Message */}
           {error && <div className="alert alert-danger">{error}</div>}
 
-          {/* Search Results */}
           {showTable && (
             <div>
               <div className="d-flex justify-content-between align-items-center">
                 <h5 className="text-primary">Search Results</h5>
-                <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => setShowTable(false)}
-                >
+                <button className="btn btn-sm btn-danger" onClick={() => setShowTable(false)}>
                   Close
                 </button>
               </div>
@@ -114,12 +106,28 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
                     <th>Last Name</th>
                     <th>Contact</th>
                     <th>Date of Birth</th>
-                  
-                    
                     <th>Residential_location</th>
                     <th>Residential_Gps_Address</th>
-                   
-                   
+                    <th style={{ display: 'none' }}>home</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>id Number</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>id Type</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>date of issue</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>expiry date</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>streetName</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>residential_gps_address</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>residential_location</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>residential_address</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>church name</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>church Location</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>spouseName</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>religion</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>fathers name</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>mothers name</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>fathers contact</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>mothers contact</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>spouseContact contact</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>number_of_dependants</th> {/* Hide the column */}
+                    <th style={{ display: 'none' }}>number_of_dependants_schooling</th> {/* Hide the column */}
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -132,10 +140,30 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
                       <td>{customer.last_name || 'N/A'}</td>
                       <td>{customer.telephone_number || 'N/A'}</td>
                       <td>{formatDate(customer.date_of_birth) || 'N/A'}</td>
-                      
                       <td>{customer.residential_location || 'NA'}</td>
                       <td>{customer.residential_gps_address || 'NA'}</td>
-                     
+                      <td style={{ display: 'none' }}>{customer.home_town || 'NA'}</td> {/* Hide the column */}
+                      <td style={{ display: 'none' }}>{customer.id_number || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.form_of_id || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{formatDate(customer.date_of_issue )|| 'NA'}</td>
+                      <td style={{ display: 'none' }}>{formatDate(customer.id_expiry_date )|| 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.street_name || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.residential_gps_address || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.residential_location || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.residential_address || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.churhName || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.churchLocation || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.spouseName || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.religion || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.fathersName || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.mothersName || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.fathersContact || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.mothersContact || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.spouseContact || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.number_of_dependants || 'NA'}</td>
+                      <td style={{ display: 'none' }}>{customer.number_of_dependants_schooling || 'NA'}</td>
+                      
+                      
                       <td>
                         <button
                           onClick={() => handleSelectCustomer(customer)}
@@ -154,18 +182,19 @@ const CustomerSearch1 = ({ onSelectCustomer }) => {
           {!showTable && !error && (
             <div className="text-muted text-center">No customers found. Try another search query.</div>
           )}
+
           {submitStatus && (
-        <div className={`alert ${submitStatus.success ? 'alert-success' : 'alert-danger'}`}>
-          {submitStatus.message}
-          <button
-            type="button"
-            className="btn btn-sm btn-link float-end"
-            onClick={handleOkClick}
-          >
-            OK
-          </button>
-        </div>
-      )}
+            <div className={`alert ${submitStatus.success ? 'alert-success' : 'alert-danger'}`}>
+              {submitStatus.message}
+              <button
+                type="button"
+                className="btn btn-sm btn-link float-end"
+                onClick={handleOkClick}
+              >
+                OK
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

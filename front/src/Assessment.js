@@ -1,11 +1,15 @@
+// Assessment.js
 import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Import Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './App1.css';
+import { FaUser } from 'react-icons/fa';
+import CustomerInfo from './CustomerInfo';
+//import Approval from './Approval'; 
 
 const Assessment = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('bio'); // Default to 'bio'
+  const [selectedCategory, setSelectedCategory] = useState('bio');
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -38,89 +42,75 @@ const Assessment = () => {
     { key: 'loan', label: 'Loan Information' },
     { key: 'info', label: 'Guarantor Information' },
     { key: 'credit', label: 'Credit Assessment' },
+    { key: 'coll', label: 'Collateral Information' },
     { key: 'app', label: 'Approval and Comment' },
-    { key: 'print', label: 'Print' }, // Add print option
+    { key: 'print', label: 'Print' },
   ];
 
-  const getCategoryColumns = (category) => {
-    switch (category) {
-      case 'bio':
-        return ['customerId', 'fullName', 'dateOfBirth', 'telephoneNumber', 'residentialAddress', 'gpsAddress'];
-      case 'loan':
-        return [
-          'amountRequested', 'businessType', 'businessLocation', 'businessStartDate', 'nearestLandmark',
-          'businessDescription', 'currentStockValue', 'startedBusinessWith', 'sourceOfFund', 'principal',
-          'rate', 'loanTerm', 'loanAmount', 'interest', 'monthlyInstallment', 'monthlySalesRevenue',
-          'cashAmount', 'householdSurplus', 'grossMarginInput', 'grossProfit', 'costOfGoodsSold',
-          'totalOperatingExpenses', 'netBusinessProfit', 'householdExpenseInput', 'otherIncomeInput',
-          'loanReccomendation', 'location', 'landTitle', 'marketValue', 'Itv_ratio', 'Itv_ratio_plus_10',
-          'digitalAddress', 'forceSale', 'comment',
-        ];
-      case 'info':
-        return ['guarantorName', 'relationship', 'guarantorResidential', 'guarantorGpsAddress'];
-      case 'credit':
-        return ['creditOfficer', 'monthlyInstallment', 'grossProfit', 'netBusinessProfit'];
-      case 'app':
-        return ['comment'];
-      default:
-        return [];
-    }
-  };
+  //const handlePrint = () => {
+    // Implement print logic...
+// };
 
-  const handlePrint = () => {
-    const allCategories = ['bio', 'loan', 'info', 'credit', 'app'];
-    const combinedData = allCategories.reduce((result, category) => {
-      const columns = getCategoryColumns(category);
-      result[category] = columns;
-      return result;
-    }, {});
+const handlePrint = () => {
+  const printableContent = document.createElement('div');
 
-    // Prepare print window
-    const printWindow = window.open('', '', 'height=800,width=1000');
-    printWindow.document.write('<html><head><title>Print Customer Data</title>');
-    printWindow.document.write(
-      '<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">'
-    );
-    printWindow.document.write('</head><body>');
-    printWindow.document.write('<h1 class="text-center">Customer Data</h1>');
+  // Add a header to the printable content
+  printableContent.innerHTML = '<h2>Customer Assessment Report</h2>';
 
-    // Render each category's data
-    allCategories.forEach((category) => {
-      const columns = combinedData[category];
-      printWindow.document.write(`<h3>${menuItems.find((item) => item.key === category)?.label}</h3>`);
-      printWindow.document.write('<table class="table table-bordered table-striped">');
-      printWindow.document.write('<thead><tr>');
+  menuItems.forEach((item) => {
+    printableContent.innerHTML += `<h3>${item.label}</h3>`;
 
-      // Add headers
-      columns.forEach((col) => {
-        printWindow.document.write(`<th>${col}</th>`);
-      });
-      printWindow.document.write('</tr></thead><tbody>');
-
-      // Add rows for customers
+    if (item.key === 'app') {
+      // For the Approval component, include its specific content
+      printableContent.innerHTML += document.querySelector('.card-body').innerHTML;
+    } else if (customers.length > 0) {
       customers.forEach((customer) => {
-        printWindow.document.write('<tr>');
-        columns.forEach((col) => {
-          let cellValue = customer[col];
-          if (col === 'dateOfBirth' && cellValue) {
-            const date = new Date(cellValue);
-            cellValue = date.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            });
-          }
-          printWindow.document.write(`<td>${cellValue || 'N/A'}</td>`);
-        });
-        printWindow.document.write('</tr>');
+        printableContent.innerHTML += `<div style="margin-bottom: 20px;">`;
+
+        // Safely check and include fields for each category
+        if (item.key === 'bio') {
+          printableContent.innerHTML += `<p>Name: ${customer.name || 'N/A'}</p>`;
+          printableContent.innerHTML += `<p>Date of Birth: ${customer.dob ? formatDate(customer.dob) : 'N/A'}</p>`;
+        } else if (item.key === 'loan') {
+          printableContent.innerHTML += `<p>Loan Amount: ${customer.loanAmount || 'N/A'}</p>`;
+          printableContent.innerHTML += `<p>Loan Purpose: ${customer.loanPurpose || 'N/A'}</p>`;
+        } else if (item.key === 'info') {
+          printableContent.innerHTML += `<p>Guarantor Name: ${customer.guarantorName || 'N/A'}</p>`;
+          printableContent.innerHTML += `<p>Guarantor Contact: ${customer.guarantorContact || 'N/A'}</p>`;
+        } else if (item.key === 'credit') {
+          printableContent.innerHTML += `<p>Credit Score: ${customer.creditScore || 'N/A'}</p>`;
+          printableContent.innerHTML += `<p>Credit History: ${customer.creditHistory || 'N/A'}</p>`;
+        } else if (item.key === 'coll') {
+          printableContent.innerHTML += `<p>Collateral Type: ${customer.collateralType || 'N/A'}</p>`;
+          printableContent.innerHTML += `<p>Collateral Value: ${customer.collateralValue || 'N/A'}</p>`;
+        }
+
+        printableContent.innerHTML += `</div>`;
       });
+    } else {
+      printableContent.innerHTML += `<p>No data available for ${item.label}.</p>`;
+    }
+  });
 
-      printWindow.document.write('</tbody></table>');
+  // Create a printable window and print the content
+  const printWindow = window.open('', '', 'width=800,height=600');
+  printWindow.document.write('<html><head><title>Print</title></head><body>');
+  printWindow.document.write(printableContent.innerHTML);
+  printWindow.document.write('</body></html>');
+  printWindow.document.close();
+  printWindow.print();
+};
+
+
+ 
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
-
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
   };
 
   return (
@@ -136,7 +126,7 @@ const Assessment = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   if (item.key === 'print') {
-                    handlePrint(); // Trigger print when print option is clicked
+                    handlePrint();
                   } else {
                     setSelectedCategory(item.key);
                   }
@@ -159,38 +149,22 @@ const Assessment = () => {
             <div className="card-body">
               {loading ? (
                 <div className="alert alert-info text-center">Loading customer data...</div>
+              
               ) : customers.length === 0 ? (
+
                 <div className="alert alert-warning text-center">No customer data available</div>
               ) : (
-                <div className="table-responsive">
-                  <table className="table table-striped table-hover">
-                    <thead className="thead-dark">
-                      <tr>
-                        {getCategoryColumns(selectedCategory).map((col) => (
-                          <th key={col}>{col}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {customers.map((customer, index) => (
-                        <tr key={index}>
-                          {getCategoryColumns(selectedCategory).map((col) => {
-                            let cellValue = customer[col];
-                            if ((col === 'dateOfBirth' || col === 'businessStartDate') && cellValue) {
-                              const date = new Date(cellValue);
-                              cellValue = date.toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                              });
-                            }
-                            return <td key={col}>{cellValue || 'N/A'}</td>;
-                          })}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+            
+                customers.map((customer, index) => (
+                  <div key={index} className="container my-4">
+                    <CustomerInfo selectedCategory={selectedCategory} customer={customer} formatDate={formatDate} />
+                    
+
+                  
+                  
+                    
+                  </div>
+                ))
               )}
             </div>
           </div>

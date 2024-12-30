@@ -40,6 +40,8 @@ const Expenses = ({
   surplusValue,
   setSurplusValue,
   handleSurplusCalculation,
+  surplusInterpretation,
+  setSurplusInterpretation
    // Accept customer as a prop
 
 
@@ -51,7 +53,7 @@ const Expenses = ({
 }) => {
   
     const [showSurplus, setShowSurplus] = useState(false); 
-    const [surplusInterpretation, setSurplusInterpretation] = useState(""); // New state
+  // const [surplusInterpretation, setSurplusInterpretation] = useState(""); // New state
 
 
     const calculateLoanDetails = () => {
@@ -426,6 +428,27 @@ const Expenses = ({
              />
           </div>
         </div>
+
+        <div className="col-md-6 mb-4 bg-white">
+                <label htmlFor="surplus" className="form-label text-white">
+                 Surplus Interpretation
+               </label>
+               <div className="input-group">
+               <div className="input-group-text bg-white text-white">
+                GH¢
+              </div>
+             <input
+             type="text"
+             className={`form-control form-control-sm bg-white text-white ${
+            surplusValue < 0 ? "text-danger" : "text-success"
+             }`}
+             id="surplus"
+                 value={surplusInterpretation}
+              readOnly
+              />
+           </div>
+          </div>
+
 
 
         {/* Interpretation Display */}

@@ -4,11 +4,20 @@ import './App.css';
 import logo from './image/yonko.png';
 import CustomerRegistration from './CustomerRegistration';
 import CustomerSearch from './CustomerSearch';
-import CreateNewApplication from './CreateNewApplication';
+//import CreateNewApplication from './CreateNewApplication';
 import IndividualLoan from './IndividualLoan';
 import { FaUserCircle } from 'react-icons/fa';
 import { MdAssessment } from 'react-icons/md';
-import ChangePassword from './ChangePassword';  // Import the ChangePassword component
+import ChangePassword from './ChangePassword'; 
+import ApproveFile from './ApproveFile';
+import Admin from './Admin';
+import ReportsDisbursed from './ReportsDisbursed';
+import PersonalLoan from './PersonalLoan';
+// Example: Check for duplicate imports
+import { Grid, Paper, Typography } from '@mui/material';
+import ChristmasAnimation from './ChristmasAnimation';
+
+import Disbursed from './Disbursed'; // Import the component
 
 // Import React Icons
 import {
@@ -21,6 +30,7 @@ import {
   FaMoneyCheckAlt, // Loan Repayments
   FaHandHoldingUsd, // Loans Disbursed
   FaWallet, // Cash on Hand
+  FaUserShield, // Admin Icon
 } from 'react-icons/fa';
 import Assessment from './Assessment';
 
@@ -36,13 +46,32 @@ const DashboardPage = () => {
   const [isCustomerMenuOpen, setIsCustomerMenuOpen] = useState(false);
   const [isLoanMenuOpen, setIsLoanMenuOpen] = useState(false);
   const [isCreditAssessmentMenuOpen, setIsCreditAssessmentMenuOpen] = useState(false);
+  const [IsLoanSubMenuOpen, setIsLoanSubMenuOpen] = useState(false);
   const [isCreditComiteeMenu, setIsCreditComiteeMenu] = useState(false);
+  const [isReportMenu, setIsReportMenu] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false); 
+  const [showChristmasAnimation, setShowChristmasAnimation] = useState(false);
+
+  const [disbursedCustomers, setDisbursedCustomers] = useState([]);
 
   const location = useLocation();
   const navigate = useNavigate(); // Use navigate for redirection
   const username = location.state?.username || localStorage.getItem('username') || 'User';
+
+ // const isAdmin = username === 'admin'; // Adjust this logic as needed for your app
+ useEffect(() => {
+  const today = new Date();
+  const month = today.getMonth(); // 0-based, December is 11
+  const date = today.getDate();
+
+  // Check if the current date is between December 25th and December 31st
+  if (month === 11 && date >= 25 && date <= 27) {
+    setShowChristmasAnimation(true);
+  } else {
+    setShowChristmasAnimation(false);
+  }
+}, []); // Runs 
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -64,6 +93,9 @@ const DashboardPage = () => {
     localStorage.removeItem('authToken'); // Optional: if using a token
     navigate('/'); // Redirect to login page
   };
+
+
+ 
 
   const toggleDashboardMenu = () => {
     setIsDashboardMenuOpen(!isDashboardMenuOpen);
@@ -88,6 +120,11 @@ const DashboardPage = () => {
     setIsCreditAssessmentMenuOpen(false);
   };
 
+  const toggleLoanSubMenu = () => {
+    setIsLoanSubMenuOpen(!IsLoanSubMenuOpen);
+    setActiveSection('');
+  };
+
   const toggleCreditAssessmentMenu = () => {
     setIsCreditAssessmentMenuOpen(!isCreditAssessmentMenuOpen);
     setActiveSection('');
@@ -95,6 +132,11 @@ const DashboardPage = () => {
 
   const toggleCreditComiteeMenu = () => { 
     setIsCreditComiteeMenu(!isCreditComiteeMenu);
+    setActiveSection('');
+  };
+
+  const toggleReportMenu = () => { 
+    setIsReportMenu(!isReportMenu);
     setActiveSection('');
   };
 
@@ -118,10 +160,18 @@ const DashboardPage = () => {
       <div className="sidebar">
         <img src={logo} alt="Logo" className="logo-image" />
 
+     
         <ul className="list-unstyled">
           <li>
             <a href="#dashboard" className="text-white" onClick={toggleDashboardMenu}>
               <FaTachometerAlt /> Dashboard
+            </a>
+          </li>
+
+           {/* Admin Menu */}
+           <li>
+            <a href="#admin" className="text-white" onClick={() => handleMenuClick('Admin')}>
+              <FaUserShield /> Admin
             </a>
           </li>
           <li>
@@ -155,9 +205,27 @@ const DashboardPage = () => {
                   </button>
                 </li>
                 <li>
-                  <button className="text-white btn btn-link" onClick={() => handleMenuClick('Create New Application')}>
+                  <button className="text-white btn btn-link" onClick={toggleLoanSubMenu}>
                     <FaRegFileAlt /> New Application
                   </button>
+                  {IsLoanSubMenuOpen &&(
+                      <ul className="submenu list-unstyled ms-3">
+                      <li>
+                      <button className="text-white btn btn-link" onClick={() => handleMenuClick('Personal Loan')}>
+                          <FaRegFileAlt /> Personal Loan
+                        </button>
+
+                        <button className="text-white btn btn-link" onClick={() => handleMenuClick('Business Loan')}>
+                          <FaRegFileAlt /> Business Loan
+                        </button>
+                        <button className="text-white btn btn-link" onClick={() => handleMenuClick('Salary Loan')}>
+                          <FaRegFileAlt /> Salary Loan
+                        </button>
+
+                      </li>
+
+                    </ul>
+                  )}
                 </li>
                 <li>
                   <button className="text-white btn btn-link" onClick={toggleCreditAssessmentMenu}>
@@ -177,27 +245,56 @@ const DashboardPage = () => {
             )}
           </li>
           <li>
-            <a href="#credit" className="text-white" onClick={toggleCreditComiteeMenu}><FaClipboardList /> 
-          Credit Committee
-          </a>
-          {isCreditComiteeMenu && (
+            <a href="#credit" className="text-white" onClick={toggleCreditComiteeMenu}>
+              <FaClipboardList /> Credit Committee
+            </a>
+            {isCreditComiteeMenu && (
               <ul className="submenu list-unstyled ms-3">
                 <li>
                   <button className="text-white btn btn-link" onClick={() => handleMenuClick('Assessment Files')}>
-                    <MdAssessment /> Assessment Files
+                    <MdAssessment /> Pending Approvals
                   </button>
                 </li>
+                <li>
+                  <button className="text-white btn btn-link" onClick={() => handleMenuClick('Approve Files')}>
+                    <MdAssessment /> Approved Files
+                  </button>
+                </li>
+               
               </ul>
             )}
           </li>
 
-          <li><a href="#reports" className="text-white"><FaCogs /> Reports</a></li>
+
+          <li><a href="#reports" className="text-white" onClick={toggleReportMenu}>
+            <FaCogs /> Reports
+            </a>
+            {isReportMenu && (
+              <ul className="submenu list-unstyled ms-3">
+                <li>
+                  <button className="text-white btn btn-link" onClick={() => handleMenuClick('Disbursed Reports')}>
+                    <MdAssessment /> Disbursed Loan Reports
+                  </button>
+                </li>
+                <li>
+                  <button className="text-white btn btn-link" onClick={() => handleMenuClick('Files')}>
+                    <MdAssessment />  Files
+                  </button>
+                </li>
+               
+              </ul>
+            )}
+          
+          
+          </li>
           <li><a href="#operation" className="text-white"><FaCogs /> Operational Workflow</a></li>
         </ul>
       </div>
 
       {/* Main Content */}
       <div className="content-area">
+      
+      {showChristmasAnimation && <ChristmasAnimation />}
         <div className="welcome-section bg-primary text-white p-3 d-flex justify-content-between align-items-center">
           <div className="profile-section" style={{ position: 'relative' }}>
             <div
@@ -263,8 +360,7 @@ const DashboardPage = () => {
             <div className="online-application-message">
               <h3>Hello, Welcome to Online Application</h3>
             </div>
-          ) : activeSection === 'Create New Application' ? (
-            <CreateNewApplication />
+          
           ) : activeSection === 'Credit Assessment' ? (
             <div>
               <h3>Credit Assessment</h3>
@@ -272,25 +368,36 @@ const DashboardPage = () => {
             </div>
           ) : activeSection === 'Individual Loan' ? (
             <IndividualLoan />
+          ) : activeSection === 'Personal Loan' ? (
+            <PersonalLoan />
           ) : activeSection === 'Assessment Files' ? (
             <Assessment />
+          ) : activeSection === 'Disbursed Reports' ? (
+            <Disbursed  disbursedCustomers={disbursedCustomers}/>
           ) : activeSection === 'Change Password' ? (
             <ChangePassword />
+          ) : activeSection === 'Admin' ? (
+            <Admin/>
+          ) : activeSection === 'Approve Files' ? (
+            <ApproveFile/>
           ) : (
+
             <div className="centered-content d-flex justify-content-around text-center mt-5">
-              <div className="metric-card d-flex flex-column align-items-center p-3">
-                <FaMoneyCheckAlt size={30} className="text-primary mb-1" />
-                <p className="mb-0" style={{ fontWeight: 'normal' }}>Loan Repayments</p>
-              </div>
-              <div className="metric-card d-flex flex-column align-items-center p-3">
-                <FaHandHoldingUsd size={30} className="text-success mb-1" />
-                <p className="mb-0" style={{ fontWeight: 'normal' }}>Cash On Hand</p>
-              </div>
-              <div className="metric-card d-flex flex-column align-items-center p-3">
-                <FaWallet size={30} className="text-warning mb-2" />
-                <p className="mb-0" style={{ fontWeight: 'normal' }}>Loans Disbursed</p>
-              </div>
+            <div className="metric-card d-flex flex-column align-items-center p-4  rounded bg-white">
+              <FaMoneyCheckAlt size={40} className="text-danger mb-2" />
+              <p className="mb-0 fw-bold text-danger">Loan Repayments</p>
             </div>
+            <div className="metric-card d-flex flex-column align-items-center p-4  rounded bg-white">
+              <FaHandHoldingUsd size={40} className="text-success mb-2" />
+              <p className="mb-0 fw-bold text-success">Cash On Hand</p>
+            </div>
+            <div className="metric-card d-flex flex-column align-items-center p-4  rounded bg-white">
+              <FaWallet size={40} className="text-primary mb-2" />
+              <p className="mb-0 fw-bold text-primary">Loans Disbursed</p>
+            </div>
+          </div>
+          
+     
           )}
         </div>
       </div>

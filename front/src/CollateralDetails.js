@@ -4,6 +4,8 @@ import LandForm from './LandForm'; // Import the LandForm component
 import BuildForm from './BuildForm';
 import VehicleForm from './VehicleForm';
 import Cash from './Cash';
+//import Approval from './Approval';
+//Approval
 
 const CollateralDetails = ({ customer, onBack, onNext, hasNext }) => {
   const [lendingType, setLendingType] = useState('unsecure'); // State to track lending type
