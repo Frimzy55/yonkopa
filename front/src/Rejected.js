@@ -24,7 +24,7 @@ import moment from "moment";
 import * as XLSX from "xlsx"; // Import the library for Excel export
 import axios from "axios"; // Make sure to install axios with npm
 
-const Disbursed = ({ onBack }) => {
+const Rejected = ({ onBack }) => {
   const [customers, setCustomers] = useState([]);
   const [dateFrom, setDateFrom] = useState(""); // State for "From" date
   const [dateTo, setDateTo] = useState(""); // State for "To" date
@@ -95,7 +95,7 @@ const Disbursed = ({ onBack }) => {
     console.log("Fetching data with params:", { dateFrom: formattedDateFrom, dateTo: formattedDateTo, productType });
   
     axios
-      .get("http://localhost:5001/disbursed-customers", {
+      .get("http://localhost:5001/rejected-loans", {
         params: { dateFrom: formattedDateFrom, dateTo: formattedDateTo, productType },
       })
       .then((response) => {
@@ -111,7 +111,7 @@ const Disbursed = ({ onBack }) => {
   return (
     <div  style={{ transform: 'scale(0.9)', transformOrigin: 'top center', padding: "20px" }}>
       <Typography variant="h6" align="center" gutterBottom>
-        Disbursed Loans Report
+        Rejected Loans Report
       </Typography>
 
       {/* Card for Buttons */}
@@ -296,4 +296,4 @@ const Disbursed = ({ onBack }) => {
   );
 };
 
-export default Disbursed;            
+export default Rejected;            

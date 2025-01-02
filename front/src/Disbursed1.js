@@ -1,4 +1,3 @@
-// RejectedLoans.js
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -13,8 +12,9 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import axios from "axios"; // Import axios to make HTTP requests
+import Disbursed from "./Disbursed";
 
-const RejectedLoans = ({ onBack }) => {
+const Disbursed1 = ({ onBack }) => {
   const [rejectedCustomers, setRejectedCustomers] = useState([]);
 
   // Function to format dates
@@ -23,7 +23,7 @@ const RejectedLoans = ({ onBack }) => {
   // Fetch rejected loans from the backend
   useEffect(() => {
     axios
-      .get("http://localhost:5001/rejected-loans") // Ensure this is the correct URL to your backend
+      .get("http://localhost:5001/disbursed-custom") // Ensure this is the correct URL to your backend
       .then((response) => {
         setRejectedCustomers(response.data); // Set the fetched data to the state
       })
@@ -35,7 +35,7 @@ const RejectedLoans = ({ onBack }) => {
   return (
     <div style={{ padding: "20px" }}>
       <Typography variant="h4" align="center" gutterBottom>
-        Rejected Files
+        Disbursed Files
       </Typography>
       <Button
         variant="contained"
@@ -73,4 +73,5 @@ const RejectedLoans = ({ onBack }) => {
   );
 };
 
-export default RejectedLoans;
+export default Disbursed1;
+

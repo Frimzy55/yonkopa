@@ -474,3 +474,8 @@ tbody tr:hover {
   background-color: #f1f1f1;  /* Optional background color on hover */
 }
 
+
+
+.hiddenColumn {
+  display: none;
+}

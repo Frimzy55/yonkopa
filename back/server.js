@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const pool = require('./db'); // Adjust path as needed
 const cron = require('node-cron');
 //const { Customer } = require('./models');
+const moment = require("moment"); // Make sure moment is imported
 
 
 // Create a pool
@@ -333,6 +334,7 @@ app.post('/loan-application', (req, res) => {
 app.get('/loan-application', (req, res) => {
   const query = `
     SELECT 
+       
       customer_id, 
       CONCAT(first_name, ' ', last_name) AS applicant_name, 
       telephone_number, 
@@ -356,6 +358,10 @@ app.get('/loan-application', (req, res) => {
       
       
     FROM loanapplication
+      
+      
+      
+    
   `;
 
   // Perform the query
@@ -463,24 +469,6 @@ app.post('/customer', (req, res) => {
     }
   );
 });
-
-
-
-
- // db.query(query, (err, result) => {
-   // if (err) {
-    //  console.error('Error deleting expired customer details:', err);
-    //} else {
-    //  console.log(`Deleted ${result.affectedRows} expired customer records.`);
-    //}
-  //});
-
-
-
-
-
-      
-      
 
     
 
@@ -1117,42 +1105,172 @@ const promiseConnection = db.promise();
 app.delete('/customers/:id', (req, res) => {
   const customerId = req.params.id;
 
-  // Use the promise-based query
-  promiseConnection.query('DELETE FROM approval1 WHERE customer_id = ?', [customerId])
-    .then(result => {
-      if (result.affectedRows === 0) {
-        return res.status(404).json({ message: 'Customer not found' });
-      }
-      res.status(200).json({ message: 'Customer deleted successfully' });
+  // Start a transaction
+  promiseConnection.beginTransaction()
+    .then(() => {
+      // Insert customer data from approval1 into new_table
+      const insertQuery = `
+        INSERT INTO dibursed
+        SELECT * FROM approval1 WHERE customer_id = ?;
+      `;
+      return promiseConnection.query(insertQuery, [customerId]);
     })
-    .catch(error => {
-      console.error('Error deleting customer:', error);
-      res.status(500).json({ message: 'Internal server error' });
+    .then((insertResult) => {
+      // If the insert was successful, delete the customer from approval1
+      const deleteQuery = 'DELETE FROM approval1 WHERE customer_id = ?';
+      return promiseConnection.query(deleteQuery, [customerId]);
+    })
+    .then((deleteResult) => {
+      if (deleteResult.affectedRows === 0) {
+        // If no rows were deleted, the customer was not found
+        return promiseConnection.rollback().then(() => {
+          res.status(404).json({ message: 'Customer not found' });
+        });
+      }
+
+      // Commit the transaction
+      return promiseConnection.commit().then(() => {
+        res.status(200).json({ message: 'Customer data moved and deleted successfully' });
+      });
+    })
+    .catch((error) => {
+      // Rollback the transaction if any error occurs
+      promiseConnection.rollback().then(() => {
+        console.error('Error during transaction:', error);
+        res.status(500).json({ message: 'Internal server error' });
+      });
     });
 });
 
 
 
-
-app.get("/api/customer1/:id", (req, res) => {
-  const customerId = req.params.id;
-
-  // SQL query to fetch customer data based on customer_id
-  const query = "SELECT * FROM customer_approvaltwo WHERE customer_id = ?";
-
-  db.query(query, [customerId], (err, results) => {
+/*app.get("/disbursed-customers", (req, res) => {
+  const query = "SELECT * FROM dibursed"; // Adjust your table and query as needed
+  db.query(query, (err, results) => {
     if (err) {
-      console.error("Error fetching customer data: ", err);
-      return res.status(500).json({ message: "Internal server error" });
+      console.error("Error fetching data: ", err);
+      res.status(500).json({ error: "Failed to fetch data" });
+    } else {
+      res.json(results);
     }
+  });
+}); */
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: "Customer not found" });
+app.get("/disbursed-customers", (req, res) => {
+  const { dateFrom, dateTo, productType } = req.query; // Get the productType parameter
+
+  // Ensure from and to dates are in 'YYYY-MM-DD' format
+  const formattedFrom = moment(dateFrom).startOf("day").format("YYYY-MM-DD HH:mm:ss");
+  const formattedTo = moment(dateTo).endOf("day").format("YYYY-MM-DD HH:mm:ss");
+
+  // Start building the query
+  let query = `
+    SELECT * FROM dibursed
+    WHERE disbursed_at BETWEEN ? AND ? 
+  `;
+
+  // Add product type filter if it is specified
+  const queryParams = [formattedFrom, formattedTo];
+
+  if (productType) {
+    query += ` AND loan_type = ?`;  // Assuming the column for loan type in your table is "loan_type"
+    queryParams.push(productType);
+  }
+
+  // Execute the query
+  db.query(query, queryParams, (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "Error fetching data" });
     }
-
-    res.json(results[0]); // Return the first matching customer record
+    res.json(results);
   });
 });
+
+app.get("/disbursed-custom", (req, res) => {
+  const query = "SELECT * FROM dibursed"; // Adjust your table and query as needed
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching data: ", err);
+      res.status(500).json({ error: "Failed to fetch data" });
+    } else {
+      res.json(results);
+    }
+  });
+}); 
+
+
+
+
+/*app.get("/disbursed-customers", (req, res) => {
+  const { fromDate, toDate, productType, filterBy } = req.query;
+
+  let query = `SELECT * FROM dibursed WHERE ${filterBy === "disbursed_date" ? "disbursed_at" : "applicant_date"} BETWEEN '${fromDate}' AND '${toDate}'`;
+
+  // Apply product type filter if provided
+  if (productType) {
+    query += ` AND product_type = '${productType}'`;
+  }
+
+  db.query(query, (err, results) => {
+    if (err) return res.status(500).send(err);
+    res.send(results);
+  });
+}); */
+
+app.delete('/customers1/:id', (req, res) => {
+  const customerId = req.params.id;
+
+  // Start a transaction
+  promiseConnection.beginTransaction()
+    .then(() => {
+      // Insert customer data from approval1 into new_table
+      const insertQuery = `
+        INSERT INTO reject
+        SELECT * FROM approval1 WHERE customer_id = ?;
+      `;
+      return promiseConnection.query(insertQuery, [customerId]);
+    })
+    .then((insertResult) => {
+      // If the insert was successful, delete the customer from approval1
+      const deleteQuery = 'DELETE FROM approval1 WHERE customer_id = ?';
+      return promiseConnection.query(deleteQuery, [customerId]);
+    })
+    .then((deleteResult) => {
+      if (deleteResult.affectedRows === 0) {
+        // If no rows were deleted, the customer was not found
+        return promiseConnection.rollback().then(() => {
+          res.status(404).json({ message: 'Customer not found' });
+        });
+      }
+
+      // Commit the transaction
+      return promiseConnection.commit().then(() => {
+        res.status(200).json({ message: 'Customer data moved and deleted successfully' });
+      });
+    })
+    .catch((error) => {
+      // Rollback the transaction if any error occurs
+      promiseConnection.rollback().then(() => {
+        console.error('Error during transaction:', error);
+        res.status(500).json({ message: 'Internal server error' });
+      });
+    });
+});
+
+
+// server.js
+app.get("/rejected-loans", (req, res) => {
+  const query = "SELECT * FROM reject"; // Adjust this query to match your database structure
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching rejected loans: ", err);
+      res.status(500).json({ error: "Failed to fetch rejected loans" });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 
 
 
@@ -1315,6 +1433,18 @@ app.post('/loans-application', (req, res) => {
 });
 
 
+// GET endpoint to fetch all applicants' data
+app.get('/api/online', (req, res) => {
+  const sql = 'SELECT * FROM online_applicant';
+  
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Error fetching customer data:', err);
+      return res.status(500).json({ error: 'Failed to fetch customer data' });
+    }
+    res.status(200).json(result);
+  });
+});
 
 
 

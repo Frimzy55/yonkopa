@@ -22,6 +22,8 @@ import moment from "moment";
 import RejectedLoans from "./RejectedLoans";
 import Disbursed from "./Disbursed";
 import ViewDetails from "./ViewDetails";
+import Disbursed1 from "./Disbursed1";
+import CommentView from "./CommentView";
 
 function ApproveFile() {
   const [customers, setCustomers] = useState([]);
@@ -32,7 +34,9 @@ function ApproveFile() {
   const [showRejectedView, setShowRejectedView] = useState(false);
   const [showDisbursedView, setShowDisbursedView] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedCustomer1, setSelectedCustomer1] = useState(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isDetailsDialogOpen1, setIsDetailsDialogOpen1] = useState(false);
 
   useEffect(() => {
     async function fetchCustomerData() {
@@ -54,14 +58,41 @@ function ApproveFile() {
     const storedDisbursed =
       JSON.parse(localStorage.getItem("disbursedCustomers")) || [];
     setDisbursedCustomers(storedDisbursed);
+
+    const storedRejected =
+      JSON.parse(localStorage.getItem("rejectedCustomers")) || [];
+    setRejectedCustomers(storedRejected);
   }, []);
 
   const handleAction = async (action, customer) => {
     if (action === "reject") {
-      setRejectedCustomers((prev) => [...prev, customer]);
-      setCustomers((prev) =>
-        prev.filter((c) => c.customer_id !== customer.customer_id)
-      );
+      try {
+        const response = await fetch(`http://localhost:5001/customers1/${customer.customer_id}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to reject customer from the database");
+        }
+
+        const updatedCustomers = customers.filter(
+          (c) => c.customer_id !== customer.customer_id
+        );
+        setCustomers(updatedCustomers);
+
+        const updatedRejectedCustomers = [...rejectedCustomers, customer];
+        setRejectedCustomers(updatedRejectedCustomers);
+
+        localStorage.setItem(
+          "rejectedCustomers",
+          JSON.stringify(updatedRejectedCustomers)
+        );
+
+        alert("Customer rejected and removed from the database.");
+      } catch (error) {
+        console.error(error);
+        alert("An error occurred while processing the rejection.");
+      }
     } else if (action === "DisbursedLoan") {
       try {
         const response = await fetch(`http://localhost:5001/customers/${customer.customer_id}`, {
@@ -94,13 +125,20 @@ function ApproveFile() {
       setSelectedCustomer(customer);
       setIsDetailsDialogOpen(true);
     } else if (action === "view-comment") {
-      alert(`Comment for ${customer.full_name}: ${customer.comment || "No comment available"}`);
+     // alert(`Comment for ${customer.full_name}: ${customer.comment || "No comment available"}`);
+      setSelectedCustomer(customer);
+      setIsDetailsDialogOpen1(true);
     }
   };
 
   const handleCloseDetailsDialog = () => {
     setSelectedCustomer(null);
     setIsDetailsDialogOpen(false);
+  };
+
+  const handleCloseDetailsDialog1 = () => {
+    setSelectedCustomer(null);
+    setIsDetailsDialogOpen1(false);
   };
 
   const formatDate = (dateString) => moment(dateString).format("MM/DD/YYYY");
@@ -137,17 +175,28 @@ function ApproveFile() {
     );
   }
 
+  //if (showDisbursedView) {
+   // return (
+      //<Disbursed
+        //disbursedCustomers={disbursedCustomers}
+      //  onBack={() => setShowDisbursedView(false)}
+     // />
+   // );
+  //}
+
   if (showDisbursedView) {
     return (
-      <Disbursed
+      <Disbursed1
         disbursedCustomers={disbursedCustomers}
         onBack={() => setShowDisbursedView(false)}
       />
     );
   }
 
+
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div   style={{ transform: 'scale(0.9)', transformOrigin: 'top center', padding: "20px" }}>
       <Typography variant="h4" align="center" gutterBottom>
         Approve Customer Files
       </Typography>
@@ -176,20 +225,28 @@ function ApproveFile() {
               <TableCell>Telephone</TableCell>
               <TableCell>Application Date</TableCell>
               <TableCell>Approval Date</TableCell>
-              <TableCell>Residential Address</TableCell>
+              <TableCell style={{ display: "none" }}>Residential Address</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {customers.map((customer) => (
+          {customers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  No Data Available
+                </TableCell>
+              </TableRow>
+              ) : (
+            customers.map((customer) => (
               <TableRow key={customer.customer_id}>
                 <TableCell>{customer.customer_id}</TableCell>
                 <TableCell>{customer.full_name}</TableCell>
                 <TableCell>{customer.telephone_number}</TableCell>
                 <TableCell>{formatDate(customer.applicant_date)}</TableCell>
                 <TableCell>{formatDate(customer.approval_date)}</TableCell>
-                <TableCell>{customer.residential_address}</TableCell>
+                <TableCell style={{ display: "none" }}>{customer.residential_address}</TableCell>
                 <TableCell>
+               
                   <FormControl variant="outlined" style={{ minWidth: 150 }}>
                     <InputLabel>Action</InputLabel>
                     <Select
@@ -224,7 +281,8 @@ function ApproveFile() {
                   </FormControl>
                 </TableCell>
               </TableRow>
-            ))}
+            ))
+          )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -233,6 +291,12 @@ function ApproveFile() {
         customer={selectedCustomer}
         isOpen={isDetailsDialogOpen}
         onClose={handleCloseDetailsDialog}
+      />
+
+    <CommentView
+        customer={selectedCustomer}
+        isOpen={isDetailsDialogOpen1}
+        onClose={handleCloseDetailsDialog1}
       />
     </div>
   );

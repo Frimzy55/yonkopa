@@ -5,6 +5,7 @@ import logo from './image/yonko.png';
 import CustomerRegistration from './CustomerRegistration';
 import CustomerSearch from './CustomerSearch';
 //import CreateNewApplication from './CreateNewApplication';
+import OnlineApplicant from './OnlineApplicant';
 import IndividualLoan from './IndividualLoan';
 import { FaUserCircle } from 'react-icons/fa';
 import { MdAssessment } from 'react-icons/md';
@@ -18,6 +19,7 @@ import { Grid, Paper, Typography } from '@mui/material';
 import ChristmasAnimation from './ChristmasAnimation';
 
 import Disbursed from './Disbursed'; // Import the component
+import Rejected from './Rejected';
 
 // Import React Icons
 import {
@@ -54,7 +56,7 @@ const DashboardPage = () => {
   const [showChristmasAnimation, setShowChristmasAnimation] = useState(false);
 
   const [disbursedCustomers, setDisbursedCustomers] = useState([]);
-
+  const [rejectedCustomers, setRejectedCustomers] = useState([]);
   const location = useLocation();
   const navigate = useNavigate(); // Use navigate for redirection
   const username = location.state?.username || localStorage.getItem('username') || 'User';
@@ -277,8 +279,8 @@ const DashboardPage = () => {
                   </button>
                 </li>
                 <li>
-                  <button className="text-white btn btn-link" onClick={() => handleMenuClick('Files')}>
-                    <MdAssessment />  Files
+                  <button className="text-white btn btn-link" onClick={() => handleMenuClick('Rejected Reports')}>
+                    <MdAssessment />  Rejected Loans Report
                   </button>
                 </li>
                
@@ -357,9 +359,7 @@ const DashboardPage = () => {
           ) : activeSection === 'Customer Search' ? (
             <CustomerSearch />
           ) : activeSection === 'Online Application' ? (
-            <div className="online-application-message">
-              <h3>Hello, Welcome to Online Application</h3>
-            </div>
+            <OnlineApplicant/>
           
           ) : activeSection === 'Credit Assessment' ? (
             <div>
@@ -374,6 +374,8 @@ const DashboardPage = () => {
             <Assessment />
           ) : activeSection === 'Disbursed Reports' ? (
             <Disbursed  disbursedCustomers={disbursedCustomers}/>
+          ) : activeSection === 'Rejected Reports' ? (
+            <Rejected  rejectedCustomers={rejectedCustomers}/>
           ) : activeSection === 'Change Password' ? (
             <ChangePassword />
           ) : activeSection === 'Admin' ? (

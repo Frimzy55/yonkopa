@@ -24,7 +24,7 @@ import moment from "moment";
 import * as XLSX from "xlsx"; // Import the library for Excel export
 import axios from "axios"; // Make sure to install axios with npm
 
-const Disbursed = ({ onBack }) => {
+const Rejects = ({ onBack }) => {
   const [customers, setCustomers] = useState([]);
   const [dateFrom, setDateFrom] = useState(""); // State for "From" date
   const [dateTo, setDateTo] = useState(""); // State for "To" date
@@ -296,4 +296,4 @@ const Disbursed = ({ onBack }) => {
   );
 };
 
-export default Disbursed;            
+export default Rejects;            
