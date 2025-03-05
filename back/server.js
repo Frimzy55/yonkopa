@@ -8,7 +8,9 @@ const pool = require('./db'); // Adjust path as needed
 const cron = require('node-cron');
 //const { Customer } = require('./models');
 const moment = require("moment"); // Make sure moment is imported
-
+require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 // Create a pool
 
@@ -59,8 +61,6 @@ app.post('/login', (req, res) => {
     }
   });
 });
-
-
 // Register endpoint for creating customers
 app.post('/register', (req, res) => {
   const {
