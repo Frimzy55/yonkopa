@@ -1,66 +1,172 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
-//const mysql = require('mysql2');
-const pool = require('./db'); // Adjust path as needed
-const cron = require('node-cron');
-//const { Customer } = require('./models');
-const moment = require("moment"); // Make sure moment is imported
-require('dotenv').config();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-
-// Create a pool
-
-
-
 
 const app = express();
-app.use(cors({ origin: '*' }));
-app.use(bodyParser.json({ limit: '10mb' })); // Allow larger payloads
 
-// Connect to MySQL database
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from your frontend
+  credentials: true,
+}));
+app.use(bodyParser.json());
+
+// JWT Secret Key
+const SECRET_KEY = process.env.JWT_SECRET || 'your_secret_key';
+
+// MySQL Database Connection
 const db = mysql.createConnection({
   host: 'localhost',
-  user: 'root',
-  password: 'CSS2244', // Replace with your database password
-  database: 'appbank' // Replace with your database name
+  user: 'root', // Replace with your MySQL username
+  password: 'CSS2244', // Replace with your MySQL password
+  database: 'appbank',
 });
 
+// Connect to MySQL
 db.connect((err) => {
   if (err) {
-    console.error('Database connection failed:', err.stack);
-    return;
+    console.error('Database connection failed:', err);
+  } else {
+    console.log('Connected to MySQL database.');
   }
-  console.log('Connected to database.');
 });
 
+
+app.post('/signup', async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  // Validate input
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({ message: 'All fields are required.' });
+  }
+
+  // Check if the email already exists
+  const checkEmailQuery = 'SELECT * FROM users1 WHERE email = ?';
+  db.query(checkEmailQuery, [email], async (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ message: 'Database error' });
+    }
+
+    if (results.length > 0) {
+      return res.status(400).json({ message: 'Email already exists.' });
+    }
+
+    // Hash the password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Insert the new user into the database
+    const insertUserQuery = 'INSERT INTO users1 (username, email, password, role) VALUES (?, ?, ?, ?)';
+    db.query(insertUserQuery, [name, email, hashedPassword, role], (err, results) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).json({ message: 'Database error' });
+      }
+
+      // Send success response
+      res.status(201).json({ message: 'User registered successfully!' });
+    });
+  });
+});
+
+
+
+// Login Endpoint
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
 
-  const query = 'SELECT id, password FROM login WHERE username = ?';
-  db.query(query, [username], (err, results) => {
+  // Validate input
+  if (!username || !password) {
+    return res.status(400).json({ message: 'Username and password are required.' });
+  }
+
+  // Query the database for the user
+  const query = 'SELECT * FROM users1 WHERE username = ?';
+  db.query(query, [username], async (err, results) => {
     if (err) {
-      console.error('Error querying the database:', err);
-      return res.status(500).json({ message: 'Server error' });
+      console.error('Database error:', err);
+      return res.status(500).json({ message: 'Database error' });
     }
 
+    // Check if user exists
     if (results.length === 0) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
 
     const user = results[0];
 
-    // Directly compare the passwords (no hashing)
-    if (password === user.password) {
-      res.status(200).json({ message: 'Login successful', username });
-    } else {
-      res.status(401).json({ message: 'Invalid username or password' });
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid username or password' });
     }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      SECRET_KEY,
+      { expiresIn: '1h' }
+    );
+
+    // Send response with token and user details
+    res.json({ token, username: user.username, role: user.role });
   });
 });
+
+// Middleware: Verify JWT Token
+function verifyToken(req, res, next) {
+  const token = req.headers['authorization'];
+  if (!token) {
+    return res.status(403).json({ message: 'Access denied. No token provided.' });
+  }
+
+  jwt.verify(token, SECRET_KEY, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Invalid or expired token.' });
+    }
+    req.user = decoded; // Attach decoded user data to the request object
+    next();
+  });
+}
+
+// Middleware: Restrict to Admins
+function requireAdmin(req, res, next) {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied. Admins only.' });
+  }
+  next();
+}
+
+// Protected Route: Dashboard (Available to All Authenticated Users)
+app.get('/dashboard', verifyToken, (req, res) => {
+  res.json({ message: `Welcome ${req.user.username}, this is your dashboard.` });
+});
+
+// Protected Route: Admin Dashboard (Available Only to Admins)
+app.get('/admin', verifyToken, requireAdmin, (req, res) => {
+  res.json({ message: 'Welcome Admin! You have special access.' });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Register endpoint for creating customers
 app.post('/register', (req, res) => {
   const {
@@ -1450,6 +1556,9 @@ app.get('/api/online', (req, res) => {
 
 
 // Server listening on port 5002
-app.listen(5001, () => {
-  console.log('Server is running on port 5002');
+
+// Start the server
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
 });

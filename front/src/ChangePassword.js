@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (newPassword !== confirmPassword) {
@@ -14,22 +16,36 @@ const ChangePassword = () => {
       return;
     }
 
-    if (currentPassword && newPassword && confirmPassword) {
-      // Simulating password change success
-      alert('Password has been changed successfully!');
-      // Reset form fields
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setErrorMessage("All fields are required.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token'); // Get the JWT token from local storage
+      const response = await axios.post(
+        'http://localhost:5000/change-password',
+        { currentPassword, newPassword, confirmPassword },
+        { headers: { Authorization: token } }
+      );
+
+      setSuccessMessage(response.data.message);
+      setErrorMessage('');
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      setErrorMessage('');
-    } else {
-      setErrorMessage("All fields are required.");
+    } catch (error) {
+      setErrorMessage(error.response?.data?.message || 'An error occurred. Please try again.');
+      setSuccessMessage('');
     }
   };
 
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">Change Password</h2>
+
+      {/* Success message */}
+      {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
       {/* Error message */}
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}

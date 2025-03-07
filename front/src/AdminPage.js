@@ -11,7 +11,7 @@ import { FaUserCircle } from 'react-icons/fa';
 import { MdAssessment } from 'react-icons/md';
 import ChangePassword from './ChangePassword'; 
 import ApproveFile from './ApproveFile';
-
+import Admin from './Admin';
 import ReportsDisbursed from './ReportsDisbursed';
 import PersonalLoan from './PersonalLoan';
 // Example: Check for duplicate imports
@@ -40,7 +40,7 @@ import {
 } from 'react-icons/fa';
 import Assessment from './Assessment';
 
-const DashboardPage = () => {
+const AdminPage = () => {
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
   const [currentDate, setCurrentDate] = useState(new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
@@ -71,21 +71,20 @@ const DashboardPage = () => {
   const [username, setUsername] = useState('');
 
 
+  //const navigate = useNavigate();
+  //const [message, setMessage] = useState('');
+
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const storedUsername = localStorage.getItem('username'); // Retrieve the username
+    const role = localStorage.getItem('role');
 
-    if (!token || !storedUsername) {
+    if (!token || role !== 'admin') {
       navigate('/');
       return;
     }
 
-    // Set the username in the state
-    setUsername(storedUsername);
-
-    // Fetch dashboard data
     axios
-      .get('http://localhost:5001/dashboard', {
+      .get('http://localhost:5001/admin', {
         headers: { Authorization: token },
       })
       .then((res) => setMessage(res.data.message))
@@ -202,7 +201,12 @@ const DashboardPage = () => {
             </a>
           </li>
 
-           
+           {/* Admin Menu */}
+           <li>
+            <a href="#admin" className="text-white" onClick={() => handleMenuClick('Admin')}>
+              <FaUserShield /> Admin
+            </a>
+          </li>
           <li>
             <a href="#customer" className="text-white" onClick={toggleCustomerMenu}>
               <FaUser /> Customer Menu
@@ -407,7 +411,8 @@ const DashboardPage = () => {
             <Rejected  rejectedCustomers={rejectedCustomers}/>
           ) : activeSection === 'Change Password' ? (
             <ChangePassword />
-          
+          ) : activeSection === 'Admin' ? (
+            <Admin/>
           ) : activeSection === 'Approve Files' ? (
             <ApproveFile/>
           ) : (
@@ -435,4 +440,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;
+export default AdminPage;
